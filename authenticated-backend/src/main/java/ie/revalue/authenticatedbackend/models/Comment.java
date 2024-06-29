@@ -18,11 +18,13 @@ public class Comment {
     @GeneratedValue
     private Integer id;
 
-    @Column(name="listingId")
-    private Integer listingId;
+    @ManyToOne
+    @JoinColumn(name="listingId", nullable = false)
+    private Listing listing;
 
-    @Column(name="userId")
-    private Integer userId;
+    @ManyToOne
+    @JoinColumn(name="userId", nullable = false)
+    private ApplicationUser user;
 
     private String comment;
     private LocalDateTime createdAt;

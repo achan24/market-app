@@ -39,6 +39,7 @@ public class SecurityConfiguration {
 
     public SecurityConfiguration(RSAKeyProperties keys){
         this.keys = keys;
+
     }
 
     @Bean //It will return BCryptPasswordEncoder anywhere we use passwordEncoder

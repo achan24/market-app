@@ -26,15 +26,22 @@ public class Listing {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    @ElementCollection
-    private List<String> images;
+    @OneToMany(mappedBy = "listing", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Image> images;
 
     private String location;
-    private Integer sellerId;
 
-    @ElementCollection
-    private List<String> comments;
+    @ManyToOne
+    @JoinColumn(name = "seller_id", referencedColumnName = "userId")
+    private ApplicationUser seller;
+
+    @ManyToOne
+    @JoinColumn(name = "buyer_id", referencedColumnName = "userId")
+    private ApplicationUser buyer;
+
+    @OneToMany(mappedBy = "listing", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
 
     private Double acceptedPrice;
-    private Integer buyerId;
+
 }

@@ -14,10 +14,21 @@ public class RSAKeyProperties {
     private RSAPublicKey publicKey;
     private RSAPrivateKey privateKey;
 
+//    public RSAKeyProperties() {
+//        KeyPair pair = KeyGeneratorUtility.generateKeyPair();
+//        publicKey = (RSAPublicKey) pair.getPublic();
+//        privateKey = (RSAPrivateKey) pair.getPrivate();
+//    }
     public RSAKeyProperties() {
-        KeyPair pair = KeyGeneratorUtility.generateKeyPair();
-        publicKey = (RSAPublicKey) pair.getPublic();
-        privateKey = (RSAPrivateKey) pair.getPrivate();
+        try {
+            KeyPair pair = KeyGeneratorUtility.generateKeyPair();
+            publicKey = (RSAPublicKey) pair.getPublic();
+            privateKey = (RSAPrivateKey) pair.getPrivate();
+            System.out.println("RSA keys generated successfully");
+        } catch (Exception e) {
+            System.err.println("Failed to generate RSA key pair: " + e.getMessage());
+            throw new RuntimeException("Failed to generate RSA key pair", e);
+        }
     }
 
 

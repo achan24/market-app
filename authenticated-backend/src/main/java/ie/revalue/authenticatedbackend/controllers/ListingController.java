@@ -1,7 +1,9 @@
 package ie.revalue.authenticatedbackend.controllers;
 
 import ie.revalue.authenticatedbackend.models.Listing;
+import ie.revalue.authenticatedbackend.models.ListingDTO;
 import ie.revalue.authenticatedbackend.service.ListingService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,22 @@ public class ListingController {
         return new ResponseEntity<>(createdListing, HttpStatus.CREATED);
     }
 
+    @PostMapping
+    public ResponseEntity<ListingDTO> createListing(@RequestBody ListingDTO listingDTO) {
+        Listing createdListing = listingService.createListing(listingDTO);
+        ListingDTO createdListingDTO = convertToDTO(createdListing);
+        return new ResponseEntity<>(createdListingDTO, HttpStatus.CREATED);
+    }
+
+    private ListingDTO convertToDTO(Listing listing) {
+        return new ListingDTO(
+                listing.getCategory(),
+                listing.getTitle(),
+                listing.getDescription(),
+                listing.getAskingPrice(),
+                listing.getLocation()
+        );
+    }
 //    @PutMapping("/{id}")
 //    public ResponseEntity<Listing> updateListing(@PathVariable Long id, @RequestBody Listing listing);
 //
