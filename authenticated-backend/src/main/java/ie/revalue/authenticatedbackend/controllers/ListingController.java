@@ -3,7 +3,6 @@ package ie.revalue.authenticatedbackend.controllers;
 import ie.revalue.authenticatedbackend.models.Listing;
 import ie.revalue.authenticatedbackend.models.ListingDTO;
 import ie.revalue.authenticatedbackend.service.ListingService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,11 +21,11 @@ public class ListingController {
 
 
     // Create a new listing
-    @PostMapping
-    public ResponseEntity<Listing> createListing(@RequestBody Listing listing) {
-        Listing createdListing = listingService.createListing(listing);
-        return new ResponseEntity<>(createdListing, HttpStatus.CREATED);
-    }
+//    @PostMapping
+//    public ResponseEntity<Listing> createListing(@RequestBody Listing listing) {
+//        Listing createdListing = listingService.createListing(listing);
+//        return new ResponseEntity<>(createdListing, HttpStatus.CREATED);
+//    }
 
     @PostMapping
     public ResponseEntity<ListingDTO> createListing(@RequestBody ListingDTO listingDTO) {
