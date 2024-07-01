@@ -1,12 +1,47 @@
-import React, { useContext } from 'react'
-import { Search, ShoppingBag, Heart, LogOut } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth, AuthContext } from './AuthContext';
+import React, { useState, useEffect, useContext } from 'react'
+import { Search, ShoppingBag, Heart, LogOut } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth, AuthContext } from './AuthContext'
+import CardListing from './CardListing'
 
 const Home = () => {
   const navigate = useNavigate()
-  const { user, isAuthenticated } = useAuth();
-  const { logout } = useContext(AuthContext);
+  const { user, isAuthenticated } = useAuth()
+  const { logout } = useContext(AuthContext)
+
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  const data = []
+  const fetchData = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/v1/listings')
+      if(!response.ok) {
+        throw new Error('Error fetching listings')
+      }
+      const data = await response.json()
+      console.log(data) 
+      return data   
+    } catch(err) {
+      console.log('Error fetching listings', err)
+    }
+  }
+  // fetchData()
+  
+  useEffect(() => {
+    const getProducts = async () => {
+      try {
+        const data = await fetchData()
+        setProducts(data)
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    getProducts();
+  }, []);
   
   // Safe logging
   console.log(`Authentication status: ${isAuthenticated}`)
@@ -34,11 +69,63 @@ const Home = () => {
       navigate('/createListing')
   }
 
+  const dummyData = [
+    {
+      title: "Vintage Wooden Coffee Table",
+      askingPrice: "120",
+      location: "San Francisco, CA",
+      image: "https://i.etsystatic.com/10486522/r/il/d0dd93/1816412232/il_fullxfull.1816412232_g98w.jpg",
+      description: "A beautifully crafted vintage wooden coffee table, perfect for adding a rustic touch to your living room. Dimensions: 48\" L x 24\" W x 18\" H.",
+      seller: "John Doe",
+      postedTime: "2 hours ago"
+    },
+    // Duplicate the same data or create variations
+    {
+      title: "Modern Art Piece",
+      askingPrice: "250",
+      location: "New York, NY",
+      image: "https://doagahehoc242.cloudfront.net/uploads/posts/726/5040b61f_piet-mondrian-composition-c-noiii-with-red-yellow-and-blue-900.jpeg",
+      description: "A vibrant modern art piece to elevate your interior decor. Dimensions: 36\" H x 24\" W.",
+      seller: "Jane Smith",
+      postedTime: "3 hours ago"
+    },
+    {
+      title: "Antique Vase",
+      askingPrice: "90",
+      location: "Los Angeles, CA",
+      image: "https://eg6dnc6a5nx.exactdn.com/wp-content/uploads/2020/07/1017-1.jpeg",
+      description: "A delicate antique vase from the 19th century. Perfect for collectors.",
+      seller: "Alice Brown",
+      postedTime: "4 hours ago"
+    },
+    {
+      title: "Handmade Rug",
+      askingPrice: "300",
+      location: "Chicago, IL",
+      image: "https://classicworldrugs.com/cdn/shop/products/classic-world-rugs-cwral-3060-005_1024x1024@2x.jpg",
+      description: "A beautiful handmade rug that adds warmth and comfort to any room.",
+      seller: "Robert Johnson",
+      postedTime: "5 hours ago"
+    },
+    {
+      title: "Luxury Watch",
+      askingPrice: "500",
+      location: "Miami, FL",
+      image: "https://globalboutique.com/wp-content/uploads/2023/05/featured-gold-watches-800x600.jpg",
+      description: "A luxury watch that combines elegance and functionality. Perfect for any occasion.",
+      seller: "Michael Williams",
+      postedTime: "6 hours ago"
+    }
+  ];
+
+  
+
   return (
     <div className="font-sans">
       {/* Header */}
       <header className="bg-white p-4 flex items-center justify-between">
-        <div className="text-2xl font-bold text-orange-500">ReValue.ie</div>
+        {/* <div className="text-2xl font-bold text-orange-500">ReValue.ie</div> */}
+        <div className="text-2xl font-bold text-green-600">ReValue.ie</div>
         <div className="flex-grow mx-4">
           <div className="relative">
             <input
@@ -104,9 +191,9 @@ const Home = () => {
           ))}
         </div>
 
-        {/* Popular Gifts */}
-        <h2 className="text-2xl font-bold mb-4">Popular gifts right now</h2>
-        <div className="grid grid-cols-5 gap-4">
+
+        <h2 className="text-2xl font-bold mb-4">Static Dummy Data Card List</h2>
+        {/* <div className="grid grid-cols-5 gap-4">
           {[1, 2, 3, 4, 5].map((item) => (
             <div key={item} className="border rounded-lg p-4">
               <div className="bg-gray-200 h-40 mb-2 rounded"></div>
@@ -119,7 +206,25 @@ const Home = () => {
               <p className="text-sm text-gray-600 line-through">€XX.XX</p>
             </div>
           ))}
+        </div> */}
+        {/* <div className="grid grid-cols-4 gap-4"> */}
+        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {dummyData.map((product, index) => (
+            <CardListing key={index} product={product} />
+          ))}
         </div>
+        {loading ?
+          <div>Loading...</div> : (
+          <div>
+            <h2 className="text-2xl font-bold mb-4">Live Data Card List</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {products.map((product, index) => (
+                <CardListing key={index} product={product} />
+              ))}
+            </div>
+          </div>
+          )
+        }
       </main>
     </div>
   );

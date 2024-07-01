@@ -11,6 +11,7 @@ import ie.revalue.authenticatedbackend.utils.RSAKeyProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -62,7 +63,8 @@ public class SecurityConfiguration {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> {
-                        auth.requestMatchers("/auth/**").permitAll(); //allow all to this endpoint
+                    auth.requestMatchers("/auth/**").permitAll(); //allow all to this endpoint
+                    auth.requestMatchers(HttpMethod.GET, "/api/v1/listings").permitAll(); // Allow GET requests to this endpoint without authentication
                     auth.requestMatchers("/admin/**").hasRole("ADMIN");
                     auth.requestMatchers("/user/**").hasAnyRole("ADMIN", "USER");
                     auth.anyRequest().authenticated();

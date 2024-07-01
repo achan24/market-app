@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
-const PhotoUpload = () => {
-  const [selectedFiles, setSelectedFiles] = useState([]);
+const PhotoUpload = ({ selectedFiles, onFilesSelect }) => {
+  //const [selectedFiles, setSelectedFiles] = useState([]);
 
   const handleFileChange = (event) => {
     const files = Array.from(event.target.files);
@@ -11,11 +11,16 @@ const PhotoUpload = () => {
       preview: URL.createObjectURL(file)
     }));
 
-    setSelectedFiles(prevFiles => [...prevFiles, ...newFiles]);
+    onFilesSelect([...selectedFiles, ...newFiles]);
+    
+    //setSelectedFiles(prevFiles => [...prevFiles, ...newFiles]);
   };
 
   const removeFile = (index) => {
-    setSelectedFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
+    URL.revokeObjectURL(selectedFiles[index].preview); //?
+    //setSelectedFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
+    const updatedFiles = selectedFiles.filter((_, i) => i !== index);
+    onFilesSelect(updatedFiles);
   };
 
   return (

@@ -17,14 +17,14 @@ const categoryData = [
     name: "Fashion & Beauty",
     subcategories: ["Women's Clothing", "Men's Clothing", "Jewelry", "Cosmetics"]
   }
-];
+]
 
 const CategorySelector = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
 
   const handleCategoryChange = (event) => {
     setSelectedCategory(event.target.value);
-  };
+  }
 
   return (
     <div className="space-y-4 p-4">

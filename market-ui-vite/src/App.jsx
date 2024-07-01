@@ -12,6 +12,8 @@ import CreateListing from './components/CreateListing'
 import PhotoUpload from './components/PhotoUpload'
 import Header from './components/Header'
 import CategorySelector from './components/CategorySelector'
+import CardListing from './components/CardListing'
+
 
 
 function App() {
@@ -28,7 +30,7 @@ function App() {
           <Route path='/photoUpload' element={<PhotoUpload />} />
           <Route path='/header' element={<Header />} />
           <Route path='/category' element={<CategorySelector />} />
-          
+          <Route path='/card' element={<CardListing />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

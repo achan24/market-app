@@ -1,12 +1,21 @@
 package ie.revalue.authenticatedbackend.controllers;
 
+import ie.revalue.authenticatedbackend.models.Image;
+import ie.revalue.authenticatedbackend.models.ImageDTO;
 import ie.revalue.authenticatedbackend.models.Listing;
 import ie.revalue.authenticatedbackend.models.ListingDTO;
 import ie.revalue.authenticatedbackend.service.ListingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/listings")
@@ -27,20 +36,48 @@ public class ListingController {
 //        return new ResponseEntity<>(createdListing, HttpStatus.CREATED);
 //    }
 
-    @PostMapping
-    public ResponseEntity<ListingDTO> createListing(@RequestBody ListingDTO listingDTO) {
-        Listing createdListing = listingService.createListing(listingDTO);
-        ListingDTO createdListingDTO = convertToDTO(createdListing);
-        return new ResponseEntity<>(createdListingDTO, HttpStatus.CREATED);
+    @PostMapping(consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ListingDTO> createListing(
+            @RequestPart("listing") ListingDTO listingDTO,
+            @RequestPart("images") List<MultipartFile> images) {
+
+        try {
+            Listing createdListing = listingService.createListing(listingDTO, images);
+            ListingDTO createdListingDTO = convertToDTO(createdListing);
+            return new ResponseEntity<>(createdListingDTO, HttpStatus.CREATED);
+        } catch (IOException e) {
+            // Handle the exception, maybe log it
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
+
+
     private ListingDTO convertToDTO(Listing listing) {
-        return new ListingDTO(
+        ListingDTO dto = new ListingDTO(
                 listing.getCategory(),
                 listing.getTitle(),
                 listing.getDescription(),
                 listing.getAskingPrice(),
-                listing.getLocation()
+                listing.getLocation(),
+                null
+        );
+
+        if (listing.getImages() != null) {
+            dto.setImages(listing.getImages().stream()
+                    .map(this::convertToImageDTO)
+                    .collect(Collectors.toList()));
+        }
+
+        return dto;
+    }
+
+    private ImageDTO convertToImageDTO(Image image) {
+        return new ImageDTO(
+                image.getFileName(),
+                image.getFileType(),
+                image.getData()
+                // Note: We're not including the image data here
         );
     }
 //    @PutMapping("/{id}")
@@ -52,8 +89,16 @@ public class ListingController {
 //    @GetMapping("/{id}")
 //    public ResponseEntity<Listing> getListing(@PathVariable Long id);
 //
-//    @GetMapping
-//    public ResponseEntity<List<Listing>> getAllListings();
+
+    @GetMapping
+    public ResponseEntity<List<ListingDTO>> getAllListings() {
+        List<Listing> listings = listingService.getAllListings();
+        List<ListingDTO> listingDTOs = listings.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(listingDTOs);
+    }
+
 //
 //    @GetMapping("/seller/{sellerId}")
 //    public ResponseEntity<List<Listing>> getListingsBySeller(@PathVariable Long sellerId);

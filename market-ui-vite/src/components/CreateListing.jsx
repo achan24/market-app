@@ -17,6 +17,7 @@ const CreateListing = () => {
   const [selectedCategory, setSelectedCategory] = useState('')
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState([]);
 
   const navigate = useNavigate()
   
@@ -24,6 +25,11 @@ const CreateListing = () => {
   const handleChange = (e) => {
     setListing({ ...listing, [e.target.name]: e.target.value })
   }
+
+
+  const handleFilesSelect = (newFiles) => {
+    setSelectedFiles(newFiles);
+  };
 
   const categoryData = [
     {
@@ -57,14 +63,23 @@ const CreateListing = () => {
       setError("You must be logged in to create a listing.");
       return;
     }
+
+    //new shit 1
+    const formData = new FormData();
+    formData.append('listing', new Blob([JSON.stringify(listing)], { type: 'application/json' }));
+    selectedFiles.forEach((file, index) => {
+      formData.append(`images`, file.file);
+    });
+
+
+
     try {
       const response = await fetch('http://localhost:8000/api/v1/listings', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(listing)
+        body: formData,
       });
       if (!response.ok) {
         const errorData = await response.json();
@@ -155,7 +170,9 @@ const CreateListing = () => {
             required
           />
         </div>
-        <PhotoUpload />
+
+        <PhotoUpload selectedFiles={selectedFiles} onFilesSelect={handleFilesSelect} />
+        
         <div>
           <label htmlFor="location" className="block text-sm font-medium text-gray-700">Location</label>
           <input
