@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PhotoUpload from './PhotoUpload';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectLabel, SelectItem} from './ui/select'
 
 const CreateListing = () => {
   const [listing, setListing] = useState({
@@ -9,11 +10,36 @@ const CreateListing = () => {
     askingPrice: 0,
     location: '',
     sellerId: 0 // This should probably come from your authentication context
-  });
+  })
+  const [selectedCategory, setSelectedCategory] = useState('')
 
   const handleChange = (e) => {
-    setListing({ ...listing, [e.target.name]: e.target.value });
-  };
+    setListing({ ...listing, [e.target.name]: e.target.value })
+  }
+
+  const categoryData = [
+    {
+      name: "Motors",
+      subcategories: ["Cars", "Motorcycles", "Trucks", "Boats"]
+    },
+    {
+      name: "Electronics & Media",
+      subcategories: ["Computers", "Phones", "TVs", "Cameras", "Other Electronics"]
+    },
+    {
+      name: "Home & Living",
+      subcategories: ["Furniture", "Home Decor", "Garden", "Appliances"]
+    },
+    {
+      name: "Fashion & Beauty",
+      subcategories: ["Women's Clothing", "Men's Clothing", "Jewelry", "Cosmetics"]
+    }
+  ]
+
+
+  const handleCategoryChange = (event) => {
+    setSelectedCategory(event.target.value);
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -47,7 +73,7 @@ const CreateListing = () => {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label htmlFor="category" className="block text-sm font-medium text-gray-700">Category</label>
-          <input
+          {/* <input
             type="text"
             id="category"
             name="category"
@@ -55,7 +81,43 @@ const CreateListing = () => {
             onChange={handleChange}
             className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             required
-          />
+          /> */}
+          {/* <select
+          id="category"
+          value={selectedCategory}
+          onChange={handleCategoryChange}
+          styles={customStyles}
+          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+        >
+          <option value="">Choose a category</option>
+          {categoryData.map((category, categoryIndex) => (
+            <React.Fragment key={categoryIndex}>
+              <option value="" disabled className="font-bold text-lg bg-gray-200 text-gray-800" style={{textTransform: 'uppercase'}}>
+                {category.name}
+              </option>
+              {category.subcategories.map((subcategory, subcategoryIndex) => (
+                <option key={`${categoryIndex}-${subcategoryIndex}`} value={`${category.name} - ${subcategory}`} className="pl-4">
+                  {subcategory}
+                </option>
+              ))}
+            </React.Fragment>
+          ))}
+        </select> */}
+        <Select onValueChange={handleCategoryChange}>
+          <SelectTrigger className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+            <SelectValue placeholder="Select a category" />
+          </SelectTrigger>
+          <SelectContent>
+            {categoryData.map((category) => (
+              <SelectGroup key={category.name}>
+                <SelectLabel>{category.name}</SelectLabel>
+                {category.subcategories.map((subcategory) => (
+                  <SelectItem key={subcategory} value={subcategory}>{subcategory}</SelectItem>
+                ))}
+              </SelectGroup>
+            ))}
+          </SelectContent>
+        </Select>
         </div>
         <div>
           <label htmlFor="title" className="block text-sm font-medium text-gray-700">Title</label>
