@@ -1,17 +1,25 @@
 import React, { useState } from 'react';
 import PhotoUpload from './PhotoUpload';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectLabel, SelectItem} from './ui/select'
+import { useAuth } from './AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const CreateListing = () => {
+  const { token } = useAuth()
   const [listing, setListing] = useState({
     title: '',
     description: '',
     category: '',
     askingPrice: 0,
     location: '',
-    sellerId: 0 // This should probably come from your authentication context
+    //sellerId: 0 // This should probably come from your authentication context
   })
   const [selectedCategory, setSelectedCategory] = useState('')
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+
+  const navigate = useNavigate()
+  
 
   const handleChange = (e) => {
     setListing({ ...listing, [e.target.name]: e.target.value })
@@ -38,34 +46,49 @@ const CreateListing = () => {
 
 
   const handleCategoryChange = (event) => {
-    setSelectedCategory(event.target.value);
+    setSelectedCategory(event)
+    setListing({ ...listing, category: event })
   }
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!token) {
+      setError("You must be logged in to create a listing.");
+      return;
+    }
     try {
       const response = await fetch('http://localhost:8000/api/v1/listings', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // Include authorization header if required
-          // 'Authorization': 'Bearer ' + yourAuthToken
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(listing)
       });
-
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
-
       const data = await response.json();
       console.log('Listing created:', data);
-      // Handle successful creation (e.g., show a success message, redirect to the new listing page)
+      setSuccess(true);
+      setError(null);
+      
+      returnHome()
     } catch (error) {
       console.error('There was an error creating the listing:', error);
-      // Handle error (e.g., show error message to user)
+      setError(error.message);
+      setSuccess(false);
     }
-  };
+  }
+
+  const returnHome = () => {
+    setTimeout(()=>{
+      navigate('/')
+    }, 1000)
+
+  }
 
   return (
     <div className="max-w-md mx-auto mt-10 bg-white p-8 border border-gray-300 rounded-lg shadow-lg">
@@ -73,37 +96,13 @@ const CreateListing = () => {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label htmlFor="category" className="block text-sm font-medium text-gray-700">Category</label>
-          {/* <input
-            type="text"
-            id="category"
-            name="category"
-            value={listing.category}
-            onChange={handleChange}
-            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            required
-          /> */}
-          {/* <select
+          
+        <Select 
           id="category"
-          value={selectedCategory}
-          onChange={handleCategoryChange}
-          styles={customStyles}
-          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+          name="category"
+          value={selectedCategory} 
+          onValueChange={handleCategoryChange}
         >
-          <option value="">Choose a category</option>
-          {categoryData.map((category, categoryIndex) => (
-            <React.Fragment key={categoryIndex}>
-              <option value="" disabled className="font-bold text-lg bg-gray-200 text-gray-800" style={{textTransform: 'uppercase'}}>
-                {category.name}
-              </option>
-              {category.subcategories.map((subcategory, subcategoryIndex) => (
-                <option key={`${categoryIndex}-${subcategoryIndex}`} value={`${category.name} - ${subcategory}`} className="pl-4">
-                  {subcategory}
-                </option>
-              ))}
-            </React.Fragment>
-          ))}
-        </select> */}
-        <Select onValueChange={handleCategoryChange}>
           <SelectTrigger className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
             <SelectValue placeholder="Select a category" />
           </SelectTrigger>
@@ -172,12 +171,20 @@ const CreateListing = () => {
         <div>
           <button
             type="submit"
+            onClick={handleSubmit}
             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
             Create Listing
           </button>
         </div>
       </form>
+      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+      {success && 
+        (<div>
+          <p className="text-green-500 text-sm mt-2 my-2">Listing created successfully!</p>
+          <p className='text-xs'>Please wait while we return you to homepage...</p>
+          </div>
+        )}
     </div>
   );
 };
