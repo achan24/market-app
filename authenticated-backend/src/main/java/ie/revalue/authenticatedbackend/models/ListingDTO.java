@@ -18,5 +18,5 @@ public class ListingDTO {
     private Double askingPrice;
     private String location;
     private List<ImageDTO> images;
-
+    private String sellerName;
 }

@@ -61,6 +61,7 @@ public class ListingController {
                 listing.getDescription(),
                 listing.getAskingPrice(),
                 listing.getLocation(),
+                null,
                 null
         );
 
@@ -68,6 +69,11 @@ public class ListingController {
             dto.setImages(listing.getImages().stream()
                     .map(this::convertToImageDTO)
                     .collect(Collectors.toList()));
+        }
+
+        // Set seller name
+        if (listing.getSeller() != null) {
+            dto.setSellerName(listing.getSeller().getUsername());
         }
 
         return dto;
@@ -89,9 +95,8 @@ public class ListingController {
 //
     @GetMapping("/{id}")
     public ResponseEntity<ListingDTO> getListingById(@PathVariable Integer id) {
-        Listing listing = listingService.getListingById(id);
-        if (listing != null) {
-            ListingDTO listingDTO = convertToDTO(listing);
+        ListingDTO listingDTO = listingService.getListingById(id);
+        if (listingDTO != null) {
             return ResponseEntity.ok(listingDTO);
         } else {
             return ResponseEntity.notFound().build();

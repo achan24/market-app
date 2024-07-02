@@ -40,10 +40,10 @@ const CardListing = (props) => {
           <div className="flex items-center space-x-4">
             <Avatar>
               <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback>{data.seller}</AvatarFallback>
+              <AvatarFallback>{data.sellerName}</AvatarFallback>
             </Avatar>
             <div>
-              <p className="text-sm font-medium">Seller</p>
+              <p className="text-sm font-medium">{data.sellerName}</p>
               <p className="text-xs text-muted-foreground">Seller</p>
             </div>
           </div>

@@ -1,14 +1,10 @@
 package ie.revalue.authenticatedbackend.service;
 
-import ie.revalue.authenticatedbackend.models.ApplicationUser;
-import ie.revalue.authenticatedbackend.models.Image;
-import ie.revalue.authenticatedbackend.models.Listing;
-import ie.revalue.authenticatedbackend.models.ListingDTO;
+import ie.revalue.authenticatedbackend.exceptions.ResourceNotFoundException;
+import ie.revalue.authenticatedbackend.models.*;
 import ie.revalue.authenticatedbackend.repository.ListingRepository;
 import ie.revalue.authenticatedbackend.repository.UserRepository;
-import org.hibernate.annotations.NaturalId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,6 +16,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ListingService {
@@ -93,7 +90,35 @@ public class ListingService {
     }
 
 
-    public Listing getListingById(Integer id) {
-        return listingRepository.findById(id).orElse(null);
+    public ListingDTO getListingById(Integer id) {
+        Listing listing = listingRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Listing not found with id " + id));
+
+        String sellerName = listing.getSeller().getUsername(); // Fetch the seller's name
+
+        ListingDTO listingDTO = new ListingDTO();
+        listingDTO.setId(listing.getId());
+        listingDTO.setCategory(listing.getCategory());
+        listingDTO.setTitle(listing.getTitle());
+        listingDTO.setDescription(listing.getDescription());
+        listingDTO.setAskingPrice(listing.getAskingPrice());
+        listingDTO.setLocation(listing.getLocation());
+        listingDTO.setImages(listing.getImages().stream()
+                .map(this::convertToImageDTO)
+                .collect(Collectors.toList()));
+        listingDTO.setSellerName(sellerName); // Set the seller's name
+
+        return listingDTO;
     }
+
+    private ImageDTO convertToImageDTO(Image image) {
+        return new ImageDTO(
+                image.getFileName(),
+                image.getFileType(),
+                image.getData() // Include the image data
+        );
+    }
+//    public Listing getListingById(Integer id) {
+//        return listingRepository.findById(id).orElse(null);
+//    }
 }
