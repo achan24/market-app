@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -17,47 +18,50 @@ const CardListing = (props) => {
   //   postedTime: "2 hours ago"
   // };
   const firstImage = data.images && data.images.length > 0 ? `data:${data.images[0].fileType};base64,${data.images[0].data}` : null;
-
+  console.log(data)
   return (
-    <Card className="w-[300px]">
-      <CardHeader>
-        {/* Probably change this afterwards */}
-        <img src={firstImage!==null?firstImage:data.image} alt={data.title} className="w-full h-48 object-cover rounded-md" />
-        <CardTitle className="mt-4">{data.title}</CardTitle>
-        <CardDescription>{data.description}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="flex justify-between items-center mb-4">
-          <Badge variant="secondary" className="text-lg font-semibold">€{data.askingPrice}</Badge>
-          <div className="flex items-center text-sm text-muted-foreground">
-            <MapPin className="mr-1" size={16} />
-            {data.location}
+    <Link to={`/listing/${data.id}`}>
+      <Card className="w-[300px] transform transition-transform duration-200 hover:scale-105
+      hover:shadow-lg hover:border-gray-400 border border-gray-300">
+        <CardHeader>
+          {/* Probably change this afterwards */}
+          <img src={firstImage!==null?firstImage:data.image} alt={data.title} className="w-full h-48 object-cover rounded-md" />
+          <CardTitle className="mt-4">{data.title}</CardTitle>
+          <CardDescription>{data.description}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex justify-between items-center mb-4">
+            <Badge variant="secondary" className="text-lg font-semibold">€{data.askingPrice}</Badge>
+            <div className="flex items-center text-sm text-muted-foreground">
+              <MapPin className="mr-1" size={16} />
+              {data.location}
+            </div>
           </div>
-        </div>
-        <div className="flex items-center space-x-4">
-          <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>{data.seller}</AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="text-sm font-medium">Seller</p>
-            <p className="text-xs text-muted-foreground">Seller</p>
+          <div className="flex items-center space-x-4">
+            <Avatar>
+              <AvatarImage src="https://github.com/shadcn.png" />
+              <AvatarFallback>{data.seller}</AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="text-sm font-medium">Seller</p>
+              <p className="text-xs text-muted-foreground">Seller</p>
+            </div>
           </div>
-        </div>
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="outline">Contact Seller</Button>
-        <div className="flex items-center space-x-2">
-          <Button variant="ghost" size="icon">
-            <Heart className="h-4 w-4" />
-          </Button>
-          <div className="flex items-center text-xs text-muted-foreground">
-            <Clock className="mr-1" size={14} />
-            {data.postedTime}
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          <Button variant="outline">Contact Seller</Button>
+          <div className="flex items-center space-x-2">
+            <Button variant="ghost" size="icon">
+              <Heart className="h-4 w-4" />
+            </Button>
+            <div className="flex items-center text-xs text-muted-foreground">
+              <Clock className="mr-1" size={14} />
+              {data.postedTime}
+            </div>
           </div>
-        </div>
-      </CardFooter>
-    </Card>
+        </CardFooter>
+      </Card>
+    </Link>
   );
 };
 

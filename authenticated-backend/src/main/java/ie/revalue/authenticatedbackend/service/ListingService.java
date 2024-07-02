@@ -91,4 +91,9 @@ public class ListingService {
 //            throw new AuthenticationCredentialsNotFoundException("User is not authenticated");
 //        }
     }
+
+
+    public Listing getListingById(Integer id) {
+        return listingRepository.findById(id).orElse(null);
+    }
 }

@@ -55,6 +55,7 @@ public class ListingController {
 
     private ListingDTO convertToDTO(Listing listing) {
         ListingDTO dto = new ListingDTO(
+                listing.getId(),
                 listing.getCategory(),
                 listing.getTitle(),
                 listing.getDescription(),
@@ -86,9 +87,23 @@ public class ListingController {
 //    @DeleteMapping("/{id}")
 //    public ResponseEntity<Void> deleteListing(@PathVariable Long id);
 //
-//    @GetMapping("/{id}")
-//    public ResponseEntity<Listing> getListing(@PathVariable Long id);
-//
+    @GetMapping("/{id}")
+    public ResponseEntity<ListingDTO> getListingById(@PathVariable Integer id) {
+        Listing listing = listingService.getListingById(id);
+        if (listing != null) {
+            ListingDTO listingDTO = convertToDTO(listing);
+            return ResponseEntity.ok(listingDTO);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
+
+
+
+
+
 
     @GetMapping
     public ResponseEntity<List<ListingDTO>> getAllListings() {

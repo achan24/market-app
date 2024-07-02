@@ -11,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ListingDTO {
 
+    private Integer id;
     private String category;
     private String title;
     private String description;

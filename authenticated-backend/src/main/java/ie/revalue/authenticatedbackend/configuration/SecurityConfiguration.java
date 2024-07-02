@@ -64,7 +64,7 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/auth/**").permitAll(); //allow all to this endpoint
-                    auth.requestMatchers(HttpMethod.GET, "/api/v1/listings").permitAll(); // Allow GET requests to this endpoint without authentication
+                    auth.requestMatchers(HttpMethod.GET, "/api/v1/listings/**").permitAll(); // Allow GET requests to this endpoint without authentication
                     auth.requestMatchers("/admin/**").hasRole("ADMIN");
                     auth.requestMatchers("/user/**").hasAnyRole("ADMIN", "USER");
                     auth.anyRequest().authenticated();
