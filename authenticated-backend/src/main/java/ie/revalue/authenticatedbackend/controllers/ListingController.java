@@ -1,15 +1,17 @@
 package ie.revalue.authenticatedbackend.controllers;
 
-import ie.revalue.authenticatedbackend.models.Image;
-import ie.revalue.authenticatedbackend.models.ImageDTO;
-import ie.revalue.authenticatedbackend.models.Listing;
-import ie.revalue.authenticatedbackend.models.ListingDTO;
+import ie.revalue.authenticatedbackend.exceptions.ResourceNotFoundException;
+import ie.revalue.authenticatedbackend.models.*;
 import ie.revalue.authenticatedbackend.service.ListingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -62,7 +64,8 @@ public class ListingController {
                 listing.getAskingPrice(),
                 listing.getLocation(),
                 null,
-                null
+                null,
+                listing.getCreatedAt()
         );
 
         if (listing.getImages() != null) {
@@ -93,13 +96,56 @@ public class ListingController {
 //    @DeleteMapping("/{id}")
 //    public ResponseEntity<Void> deleteListing(@PathVariable Long id);
 //
+
+    @GetMapping
+    public ResponseEntity<List<ListingDTO>> getAllListings() {
+        List<Listing> listings = listingService.getAllListings();
+        List<ListingDTO> listingDTOs = listings.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(listingDTOs);
+    }
+
+
     @GetMapping("/{id}")
     public ResponseEntity<ListingDTO> getListingById(@PathVariable Integer id) {
-        ListingDTO listingDTO = listingService.getListingById(id);
+        ListingDTO listingDTO = listingService.getListingDTOById(id);
         if (listingDTO != null) {
             return ResponseEntity.ok(listingDTO);
         } else {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+
+
+    @PostMapping("/{id}/comments")
+    public ResponseEntity<?> addComment(@PathVariable Integer id, @RequestBody CommentDTO commentDTO, @AuthenticationPrincipal Jwt jwt) {
+
+        try {
+            listingService.addComment(id, commentDTO.getComment(), jwt);
+            return ResponseEntity.noContent().build();
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Listing not found");
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid authentication");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred");
+        }
+    }
+
+
+    @GetMapping("/{id}/comments")
+    public ResponseEntity<?> getComments(@PathVariable Integer id) {
+        try {
+            List<CommentDTO> comments = listingService.getCommentsForListing(id);
+            return ResponseEntity.ok().body(comments);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Listing not found");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred");
         }
     }
 
@@ -110,14 +156,7 @@ public class ListingController {
 
 
 
-    @GetMapping
-    public ResponseEntity<List<ListingDTO>> getAllListings() {
-        List<Listing> listings = listingService.getAllListings();
-        List<ListingDTO> listingDTOs = listings.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(listingDTOs);
-    }
+
 
 //
 //    @GetMapping("/seller/{sellerId}")

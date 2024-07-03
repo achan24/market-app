@@ -23,7 +23,14 @@ public class Listing {
     private String title;
     private String description;
     private Double askingPrice;
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
+
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "listing", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -27,5 +27,7 @@ public class Comment {
     private ApplicationUser user;
 
     private String comment;
+
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 }

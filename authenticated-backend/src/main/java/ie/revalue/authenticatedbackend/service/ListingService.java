@@ -2,6 +2,7 @@ package ie.revalue.authenticatedbackend.service;
 
 import ie.revalue.authenticatedbackend.exceptions.ResourceNotFoundException;
 import ie.revalue.authenticatedbackend.models.*;
+import ie.revalue.authenticatedbackend.repository.CommentRepository;
 import ie.revalue.authenticatedbackend.repository.ListingRepository;
 import ie.revalue.authenticatedbackend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,9 @@ public class ListingService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private CommentRepository commentRepository;
 
 //    public Listing createListing(Listing listing) {
 //        listing.setCreatedAt(LocalDateTime.now());
@@ -73,14 +77,12 @@ public class ListingService {
     }
 
 
-
-
     //search should not require authentication
     public List<Listing> getAllListings() {
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 //        if (authentication != null && authentication.isAuthenticated()) {
 //            if (authentication.getPrincipal() instanceof Jwt) {
-                return listingRepository.findAll();
+        return listingRepository.findAll();
 //            } else {
 //                throw new IllegalStateException("Unexpected authentication type");
 //            }
@@ -90,7 +92,7 @@ public class ListingService {
     }
 
 
-    public ListingDTO getListingById(Integer id) {
+    public ListingDTO getListingDTOById(Integer id) {
         Listing listing = listingRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Listing not found with id " + id));
 
@@ -107,7 +109,7 @@ public class ListingService {
                 .map(this::convertToImageDTO)
                 .collect(Collectors.toList()));
         listingDTO.setSellerName(sellerName); // Set the seller's name
-
+        listingDTO.setCreatedAt(listing.getCreatedAt());
         return listingDTO;
     }
 
@@ -118,7 +120,38 @@ public class ListingService {
                 image.getData() // Include the image data
         );
     }
-//    public Listing getListingById(Integer id) {
+
+    //    public Listing getListingById(Integer id) {
 //        return listingRepository.findById(id).orElse(null);
 //    }
+    public void addComment(Integer listingId, String text, Jwt jwt) {
+
+        Listing listing = listingRepository.findById(listingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Listing not found"));
+
+
+        String username = jwt.getClaimAsString("sub");  // Adjust if your username is stored differently
+        ApplicationUser currentUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+
+        Comment comment = new Comment();
+        comment.setListing(listing);
+        comment.setUser(currentUser);
+        comment.setComment(text);
+        comment.setCreatedAt(LocalDateTime.now());
+
+        commentRepository.save(comment);
+
+
+
+    }
+
+
+    public List<CommentDTO> getCommentsForListing(Integer listingId) {
+        Listing listing = listingRepository.findById(listingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Listing not found"));
+        return listing.getComments().stream()
+                .map(comment -> new CommentDTO(comment.getId(), comment.getComment(), comment.getCreatedAt(), comment.getUser().getUsername()))
+                .collect(Collectors.toList());
+    }
 }
