@@ -36,6 +36,8 @@ export const AuthProvider = ({ children }) => {
     setToken(jwtToken);
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('token', jwtToken);
+    console.log('AuthContext: User logged in:', userData);
+    console.log('AuthContext: Token set:', jwtToken);
   };
 
   const logout = () => {
@@ -43,6 +45,7 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    console.log('User logged out. Token cleared.');
   };
 
   const value = {

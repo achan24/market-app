@@ -28,8 +28,8 @@ const CardListing = (props) => {
     ? relativeTime.slice(6)
     : relativeTime
 
-  console.log(data)
-  console.log(shortRelativeTime)
+  // console.log(data)
+  // console.log(shortRelativeTime)
 
   return (
     <Link to={`/listing/${data.id}`}>

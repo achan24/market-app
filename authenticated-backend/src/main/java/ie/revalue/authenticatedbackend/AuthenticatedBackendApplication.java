@@ -41,6 +41,10 @@ public class AuthenticatedBackendApplication {
                     1,
                     "admin",
                     passwordEncoder.encode("password"),
+                    "admin@revalue.ie",
+                    "Ireland",
+                    null,
+                    null,
                     roles);
 
             userRepository.save(admin);

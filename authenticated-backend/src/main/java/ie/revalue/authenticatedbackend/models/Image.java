@@ -20,7 +20,7 @@ public class Image {
     private Listing listing;
 
     @Lob
-    @Column(name="data")
+    @Column(name="data", columnDefinition = "MEDIUMBLOB")
     private byte[] data;
 
     private String fileName;

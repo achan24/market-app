@@ -118,6 +118,11 @@ const Home = () => {
     }
   ];
 
+  const handleUsernameClick = () => {
+    console.log(user)
+    console.log(user.username)
+    navigate(`/user/${user.username}`)
+  }
   
 
   return (
@@ -139,7 +144,9 @@ const Home = () => {
         <div className="flex items-center space-x-4">
           {isAuthenticated && (
               <div className='flex items-center space-x-3'>
-                <h2>{user.username}</h2>
+                <button onClick={handleUsernameClick}>
+                  <h2 className='border border-gray-400 rounded-full px-4 py-2'>{user.username}</h2>
+                </button>
                 <div className="relative group">
                   <LogOut className="cursor-pointer" onClick={logOut}/>
                   <span className="absolute invisible group-hover:visible bg-gray-800 text-white text-xs rounded py-1 px-2 top-full mt-1 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
@@ -193,26 +200,12 @@ const Home = () => {
 
 
         <h2 className="text-2xl font-bold mb-4">Static Dummy Data Card List</h2>
-        {/* <div className="grid grid-cols-5 gap-4">
-          {[1, 2, 3, 4, 5].map((item) => (
-            <div key={item} className="border rounded-lg p-4">
-              <div className="bg-gray-200 h-40 mb-2 rounded"></div>
-              <h3 className="font-semibold mb-1">Product Name</h3>
-              <div className="flex items-center mb-1">
-                <span className="text-yellow-400">★★★★★</span>
-                <span className="text-sm text-gray-600 ml-1">(1,234)</span>
-              </div>
-              <p className="font-bold">€XX.XX</p>
-              <p className="text-sm text-gray-600 line-through">€XX.XX</p>
-            </div>
-          ))}
-        </div> */}
-        {/* <div className="grid grid-cols-4 gap-4"> */}
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {dummyData.map((product, index) => (
             <CardListing key={index} product={product} />
           ))}
         </div>
+
         {loading ?
           <div>Loading...</div> : (
           <div>

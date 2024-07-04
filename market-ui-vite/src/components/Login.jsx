@@ -138,7 +138,7 @@ const Register = () => {
         setShowPopup(true);
         setTimeout(() => {
           navigate('/');
-        }, 2500);
+        }, 1500);
 
     } catch(error) {
         console.error('Login error:', error.message);

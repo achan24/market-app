@@ -55,6 +55,10 @@ public class AuthenticationService {
                         0,
                         username,
                         encodedPassword,
+                        null,
+                        null,
+                        null,
+                        null,
                         authorities
                 )
         );

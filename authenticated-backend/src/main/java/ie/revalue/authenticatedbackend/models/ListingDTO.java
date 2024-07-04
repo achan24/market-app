@@ -20,5 +20,7 @@ public class ListingDTO {
     private String location;
     private List<ImageDTO> images;
     private String sellerName;
+    private String buyerName;
+    private Double acceptedPrice;
     private LocalDateTime createdAt;
 }

@@ -2,7 +2,6 @@ package ie.revalue.authenticatedbackend.service;
 
 
 import ie.revalue.authenticatedbackend.models.ApplicationUser;
-import ie.revalue.authenticatedbackend.models.Role;
 import ie.revalue.authenticatedbackend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -39,5 +38,16 @@ public class UserService implements UserDetailsService {
 //        Set<Role> roles = new HashSet<>();
 //        roles.add(new Role(1, "User"));
 //        return new ApplicationUser(1, "Albert", passwordEncoder.encode("password"), roles);
+    }
+
+    public ApplicationUser getUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+    }
+
+    public Integer getUserIdByUsername(String username) {
+        ApplicationUser user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+        return user.getUserId();
     }
 }

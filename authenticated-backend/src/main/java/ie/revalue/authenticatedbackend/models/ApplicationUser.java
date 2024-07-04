@@ -2,16 +2,20 @@ package ie.revalue.authenticatedbackend.models;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-
+@Data
 @Entity
 @Table(name="users")
 //@NoArgsConstructor
@@ -22,9 +26,34 @@ public class ApplicationUser implements UserDetails {
     @Id
     @GeneratedValue
     private Integer userId;
+
     @Column(unique = true)
     private String username;
     private String password;
+
+    @Column(unique = true)
+    private String email;
+    private String location;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+
+
     //fetch data for authorities as soon as we fetch user information
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

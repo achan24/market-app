@@ -109,6 +109,8 @@ public class ListingService {
                 .map(this::convertToImageDTO)
                 .collect(Collectors.toList()));
         listingDTO.setSellerName(sellerName); // Set the seller's name
+        listingDTO.setBuyerName(listing.getBuyer() != null ? listing.getBuyer().getUsername() : null); // Set the buyer's name
+        listingDTO.setAcceptedPrice(listing.getAcceptedPrice()); // Set the accepted price
         listingDTO.setCreatedAt(listing.getCreatedAt());
         return listingDTO;
     }
@@ -153,5 +155,56 @@ public class ListingService {
         return listing.getComments().stream()
                 .map(comment -> new CommentDTO(comment.getId(), comment.getComment(), comment.getCreatedAt(), comment.getUser().getUsername()))
                 .collect(Collectors.toList());
+    }
+
+
+    public ListingDTO acceptOffer(Integer listingId, AcceptOfferRequest request) {
+        Listing listing = listingRepository.findById(listingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Listing not found"));
+
+        ApplicationUser buyer = userRepository.findByUsername(request.getBuyerUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        listing.setBuyer(buyer);
+        listing.setAcceptedPrice(request.getAcceptedPrice());
+        listing.setUpdatedAt(LocalDateTime.now());
+
+        listingRepository.save(listing);
+
+        return convertToDTO(listing);
+    }
+
+    private ListingDTO convertToDTO(Listing listing) {
+        ListingDTO dto = new ListingDTO(
+                listing.getId(),
+                listing.getCategory(),
+                listing.getTitle(),
+                listing.getDescription(),
+                listing.getAskingPrice(),
+                listing.getLocation(),
+                null,
+                listing.getSeller() != null ? listing.getSeller().getUsername() : null,
+                listing.getBuyer() != null ? listing.getBuyer().getUsername() : null,
+                listing.getAcceptedPrice() != null ? listing.getAcceptedPrice() : null,
+                listing.getCreatedAt()
+        );
+
+        if (listing.getImages() != null) {
+            dto.setImages(listing.getImages().stream()
+                    .map(this::convertToImageDTO)
+                    .collect(Collectors.toList()));
+        }
+
+        // Set seller name
+        if (listing.getSeller() != null) {
+            dto.setSellerName(listing.getSeller().getUsername());
+        }
+
+        // Set buyer name
+        if (listing.getBuyer() != null) {
+            dto.setBuyerName(listing.getBuyer().getUsername());
+        }
+
+        return dto;
     }
 }

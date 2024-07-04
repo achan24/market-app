@@ -64,7 +64,9 @@ public class ListingController {
                 listing.getAskingPrice(),
                 listing.getLocation(),
                 null,
-                null,
+                listing.getSeller() != null ? listing.getSeller().getUsername() : null,
+                listing.getBuyer() != null ? listing.getBuyer().getUsername() : null,
+                listing.getAcceptedPrice() != null ? listing.getAcceptedPrice() : null,
                 listing.getCreatedAt()
         );
 
@@ -77,6 +79,11 @@ public class ListingController {
         // Set seller name
         if (listing.getSeller() != null) {
             dto.setSellerName(listing.getSeller().getUsername());
+        }
+
+        // Set buyer name
+        if (listing.getBuyer() != null) {
+            dto.setBuyerName(listing.getBuyer().getUsername());
         }
 
         return dto;
@@ -147,6 +154,14 @@ public class ListingController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred");
         }
+    }
+
+
+
+    @PostMapping("/{id}/acceptOffer")
+    public ResponseEntity<ListingDTO> acceptOffer(@PathVariable Integer id, @RequestBody AcceptOfferRequest request) {
+        ListingDTO updatedListing = listingService.acceptOffer(id, request);
+        return ResponseEntity.ok(updatedListing);
     }
 
 
