@@ -3,8 +3,10 @@ package ie.revalue.authenticatedbackend.service;
 import ie.revalue.authenticatedbackend.exceptions.ResourceNotFoundException;
 import ie.revalue.authenticatedbackend.models.*;
 import ie.revalue.authenticatedbackend.repository.CommentRepository;
+import ie.revalue.authenticatedbackend.repository.ConversationRepository;
 import ie.revalue.authenticatedbackend.repository.ListingRepository;
 import ie.revalue.authenticatedbackend.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,6 +36,12 @@ public class ListingService {
 
     @Autowired
     private CommentRepository commentRepository;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private ConversationRepository conversationRepository;
 
 //    public Listing createListing(Listing listing) {
 //        listing.setCreatedAt(LocalDateTime.now());
@@ -158,21 +166,55 @@ public class ListingService {
     }
 
 
+//    public ListingDTO acceptOffer(Integer listingId, AcceptOfferRequest request) {
+//        Listing listing = listingRepository.findById(listingId)
+//                .orElseThrow(() -> new ResourceNotFoundException("Listing not found"));
+//
+//        ApplicationUser buyer = userRepository.findByUsername(request.getBuyerUsername())
+//                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+//
+//        listing.setBuyer(buyer);
+//        listing.setAcceptedPrice(request.getAcceptedPrice());
+//        listing.setUpdatedAt(LocalDateTime.now());
+//
+//        listingRepository.save(listing);
+//
+//        return convertToDTO(listing);
+//    }
+
+    @Transactional
     public ListingDTO acceptOffer(Integer listingId, AcceptOfferRequest request) {
         Listing listing = listingRepository.findById(listingId)
-                .orElseThrow(() -> new ResourceNotFoundException("Listing not found"));
+                .orElseThrow(() -> new RuntimeException("Listing not found"));
+        ApplicationUser buyer = userService.getUserByUsername(request.getBuyerUsername());
+        ApplicationUser seller = listing.getSeller();
 
-        ApplicationUser buyer = userRepository.findByUsername(request.getBuyerUsername())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-
-        listing.setBuyer(buyer);
         listing.setAcceptedPrice(request.getAcceptedPrice());
-        listing.setUpdatedAt(LocalDateTime.now());
+        listing.setBuyer(buyer);
 
         listingRepository.save(listing);
 
+        // Update seller and buyer profiles
+        userService.addSellerListing(seller.getUserId(), listingId);
+        userService.addBuyerListing(buyer.getUserId(), listingId);
+
+
+        // Create a new conversation
+        Conversation conversation = new Conversation();
+        conversation.setListing(listing);
+        conversation.setBuyer(buyer);
+        conversation.setSeller(seller);
+        conversation.setCreatedAt(LocalDateTime.now());
+        conversation.setUpdatedAt(LocalDateTime.now());
+        conversation.setClosed(false);
+
+        conversationRepository.save(conversation);
+
+
         return convertToDTO(listing);
     }
+
+
 
     private ListingDTO convertToDTO(Listing listing) {
         ListingDTO dto = new ListingDTO(
@@ -207,4 +249,6 @@ public class ListingService {
 
         return dto;
     }
+
+
 }

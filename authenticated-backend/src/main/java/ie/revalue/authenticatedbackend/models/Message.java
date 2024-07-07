@@ -20,7 +20,7 @@ public class Message {
 
     @ManyToOne
     @JoinColumn(name = "conversation_topic_id", nullable = false)
-    private ConversationTopic conversationTopic;
+    private Conversation conversationTopic;
 
     @ManyToOne
     @JoinColumn(name = "sender_id", nullable = false)

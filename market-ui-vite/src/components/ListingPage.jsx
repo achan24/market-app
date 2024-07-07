@@ -167,7 +167,7 @@ const ListingPage = () => {
         },
         body: JSON.stringify({
           buyerUsername,  // Use buyer's username
-          acceptedPrice //: parseFloat(comment.comment.replace('OFFER: €', '')),
+          acceptedPrice 
         }),
       });
   
@@ -181,9 +181,54 @@ const ListingPage = () => {
       // Update the state with the updated listing data
       setListing(updatedListing);
       setAcceptedOffer(comment);
+
+      // Update seller and buyer profiles
+    // await updateSellerProfile(listing.sellerId, listing.id);
+    // await updateBuyerProfile(user.id, listing.id);
+    
+    //I think they are all handled in acceptOffer api
+
     } catch (error) {
       console.error('Error accepting offer:', error);
       alert('Failed to accept offer. Please try again.');
+    }
+  };
+
+  const updateSellerProfile = async (sellerId, listingId) => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/v1/users/${sellerId}/addSellerListing/${listingId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to update seller profile');
+      }
+      console.log('Seller profile updated successfully');
+    } catch (error) {
+      console.error('Error updating seller profile:', error);
+    }
+  };
+  
+  const updateBuyerProfile = async (buyerId, listingId) => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/v1/users/${buyerId}/addBuyerListing/${listingId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to update buyer profile');
+      }
+      console.log('Buyer profile updated successfully');
+    } catch (error) {
+      console.error('Error updating buyer profile:', error);
     }
   };
 
@@ -278,34 +323,19 @@ const ListingPage = () => {
                   comment.comment.replace("EUR", '€') :
                   comment.comment
                 }</p>
-                {/* {isAuthenticated && user.username === listing.sellerName && comment.comment?.startsWith("OFFER:") && (
-                  (listing.buyer && listing.buyer.username === comment.username && listing.acceptedPrice) ? (
-                    <p className="text-green-500">Offer Accepted: €{listing.acceptedPrice}</p>
-                  ) : (
-                    <Button onClick={() => handleAcceptOffer(comment)}>Accept Offer</Button>
-                  )
-                )} */}
-                {isAuthenticated && user.username === listing.sellerName && comment.comment?.startsWith("OFFER:") && (
-                  (listing.buyerName && listing.buyerName === comment.username && listing.acceptedPrice != null) ? (
-                    <>
-                      {console.log('Authenticated:', isAuthenticated)}
-                      {console.log('Seller:', user.username)}
-                      {console.log('Comment Username:', comment.username)}
-                      {console.log('Listing Buyer Username:', listing.buyerName)}
-                      {console.log('Listing Accepted Price:', listing.acceptedPrice)}
+                
+                {comment.comment?.startsWith("OFFER:") && (
+                  <>
+                    {listing.buyerName && listing.buyerName === comment.username && listing.acceptedPrice != null ? (
                       <p className="text-green-500 text-lg">Offer Accepted</p>
-                    </>
-                  ) : (
-                    <>
-                      {console.log('Authenticated:', isAuthenticated)}
-                      {console.log('Seller:', user.username)}
-                      {console.log('Comment Username:', comment.username)}
-                      {console.log('Listing Buyer Username:', listing.buyer ? listing.buyerName : 'No buyer')}
-                      {console.log('Listing Accepted Price:', listing.acceptedPrice)}
-                      <Button onClick={() => handleAcceptOffer(comment)}>Accept Offer</Button>
-                    </>
-                  )
+                    ) : (
+                      isAuthenticated && user.username === listing.sellerName && (
+                        <Button onClick={() => handleAcceptOffer(comment)}>Accept Offer</Button>
+                      )
+                    )}
+                  </>
                 )}
+                
               </div>
             </div>
           </div>

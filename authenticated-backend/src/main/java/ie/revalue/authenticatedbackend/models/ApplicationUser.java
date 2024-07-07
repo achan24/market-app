@@ -52,6 +52,21 @@ public class ApplicationUser implements UserDetails {
         updatedAt = LocalDateTime.now();
     }
 
+    @ElementCollection
+    @CollectionTable(name = "user_seller_listings", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "listing_id")
+    private List<Integer> sellerListingIds;
+
+    @ElementCollection
+    @CollectionTable(name = "user_buyer_listings", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "listing_id")
+    private List<Integer> buyerListingIds;
+
+    @OneToMany(mappedBy = "buyer")
+    private List<Conversation> buyerConversations;
+
+    @OneToMany(mappedBy = "seller")
+    private List<Conversation> sellerConversations;
 
 
     //fetch data for authorities as soon as we fetch user information

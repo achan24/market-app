@@ -53,7 +53,10 @@ public class UserController {
                     user.getUsername(),
                     user.getEmail(),
                     user.getLocation(),
-                    user.getCreatedAt()
+                    user.getCreatedAt(),
+                    user.getSellerListingIds(),
+                    user.getBuyerListingIds(),
+                    user.getConversations()
             );
             System.out.println("user details: " + userDetails);
 
@@ -69,4 +72,8 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error fetching user details: " + e.getMessage());
         }
     }
+
+
+
+
 }

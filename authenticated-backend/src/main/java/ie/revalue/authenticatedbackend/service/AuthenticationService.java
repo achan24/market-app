@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.core.AuthenticationException;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -55,6 +56,10 @@ public class AuthenticationService {
                         0,
                         username,
                         encodedPassword,
+                        "user@user.com",
+                        "Cork",
+                        LocalDateTime.now(),
+                        LocalDateTime.now(),
                         null,
                         null,
                         null,

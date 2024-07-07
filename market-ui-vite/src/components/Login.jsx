@@ -113,7 +113,8 @@ const Register = () => {
             },
             body: JSON.stringify({ username, password })
         });
-
+        console.log(loginResponse)
+        
         if (!loginResponse.ok) {
             const errorData = await loginResponse.json();
             throw new Error(errorData.message || "Unknown error");

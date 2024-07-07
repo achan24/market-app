@@ -67,6 +67,7 @@ public class SecurityConfiguration {
                     auth.requestMatchers(HttpMethod.GET, "/api/v1/listings/**").permitAll(); // Allow GET requests to this endpoint without authentication
                     auth.requestMatchers("/admin/**").hasRole("ADMIN");
                     auth.requestMatchers("/user/**").hasAnyRole("ADMIN", "USER");
+                    auth.requestMatchers("/api/v1/conversations/**").authenticated();
                     auth.anyRequest().authenticated();
                 })
                 .oauth2ResourceServer(oauth2ResourceServer ->

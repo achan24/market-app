@@ -31,6 +31,9 @@ public class ListingController {
     }
 
 
+
+
+
     // Create a new listing
 //    @PostMapping
 //    public ResponseEntity<Listing> createListing(@RequestBody Listing listing) {
@@ -163,6 +166,9 @@ public class ListingController {
         ListingDTO updatedListing = listingService.acceptOffer(id, request);
         return ResponseEntity.ok(updatedListing);
     }
+
+
+
 
 
 

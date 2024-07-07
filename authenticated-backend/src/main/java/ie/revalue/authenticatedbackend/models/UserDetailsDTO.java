@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -15,11 +16,21 @@ public class UserDetailsDTO {
     private String email;
     private String location;
     private String createdAt;
+    private List<Integer> sellerListingIds;
+    private List<Integer> buyerListingIds;
+    private List<Integer> conversationIds;
 
-    public UserDetailsDTO(String username, String email, String location, LocalDateTime createdAt) {
+    public UserDetailsDTO(String username, String email, String location, LocalDateTime createdAt,
+                          List<Integer> sellerListingIds, List<Integer> buyerListingIds,
+                          List<Conversation> conversations) {
         this.username = username;
         this.email = email;
         this.location = location;
-        this.createdAt = createdAt.toString();  // Convert to String here
+        this.createdAt = (createdAt != null) ? createdAt.toString() : null;
+        this.sellerListingIds = sellerListingIds;
+        this.buyerListingIds = buyerListingIds;
+        this.conversationIds = (conversations != null && !conversations.isEmpty())
+                ? conversations.stream().map(Conversation::getId).toList()
+                : null;
     }
 }

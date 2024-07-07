@@ -90,7 +90,8 @@ const UserProfile = () => {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 
-  const formattedDate = userDetails.createdAt ? new Date(userDetails.createdAt).toLocaleDateString() : 'N/A';
+ 
+  const  formattedDate = userDetails.createdAt !== null ? new Date(userDetails.createdAt).toLocaleDateString() : 'N/A';
 
   return (
     <div className="container mx-auto p-4 font-sans bg-gray-100 min-h-screen">

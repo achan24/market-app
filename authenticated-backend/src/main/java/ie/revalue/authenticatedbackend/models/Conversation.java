@@ -13,13 +13,13 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ConversationTopic {
+public class Conversation {
 
     @Id
     @GeneratedValue
     private Integer id;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "listing_id", nullable = false)
     private Listing listing;
 

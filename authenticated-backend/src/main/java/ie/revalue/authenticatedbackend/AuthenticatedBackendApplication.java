@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -43,6 +45,10 @@ public class AuthenticatedBackendApplication {
                     passwordEncoder.encode("password"),
                     "admin@revalue.ie",
                     "Ireland",
+                    LocalDateTime.now(),
+                    LocalDateTime.now(),
+                    null,
+                    null,
                     null,
                     null,
                     roles);

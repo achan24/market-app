@@ -1,6 +1,7 @@
 package ie.revalue.authenticatedbackend.models;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,6 +35,7 @@ public class Listing {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "listing", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Image> images;
 
     private String location;
@@ -50,5 +52,8 @@ public class Listing {
     private List<Comment> comments;
 
     private Double acceptedPrice;
+
+    @OneToOne(mappedBy = "listing")
+    private Conversation conversation;
 
 }
