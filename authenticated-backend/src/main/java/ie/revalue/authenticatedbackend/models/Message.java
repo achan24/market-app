@@ -18,13 +18,11 @@ public class Message {
     @GeneratedValue
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "conversation_topic_id", nullable = false)
-    private Conversation conversationTopic;
+    @Column(name = "conversation_id", nullable = false)
+    private Integer conversationId;
 
-    @ManyToOne
-    @JoinColumn(name = "sender_id", nullable = false)
-    private ApplicationUser sender;
+    @Column(name = "sender_id", nullable = false)
+    private Integer senderId;
 
     @Column(columnDefinition = "TEXT")
     private String content;

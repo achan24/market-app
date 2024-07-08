@@ -62,11 +62,15 @@ public class ApplicationUser implements UserDetails {
     @Column(name = "listing_id")
     private List<Integer> buyerListingIds;
 
-    @OneToMany(mappedBy = "buyer")
-    private List<Conversation> buyerConversations;
+    @ElementCollection
+    @CollectionTable(name = "user_buyer_conversations", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "conversation_id")
+    private List<Integer> buyerConversationIds;
 
-    @OneToMany(mappedBy = "seller")
-    private List<Conversation> sellerConversations;
+    @ElementCollection
+    @CollectionTable(name = "user_seller_conversations", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "conversation_id")
+    private List<Integer> sellerConversationIds;
 
 
     //fetch data for authorities as soon as we fetch user information
@@ -111,5 +115,18 @@ public class ApplicationUser implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+
+    @Override
+    public String toString() {
+        return new StringBuilder("ApplicationUser{")
+                .append("userId=").append(userId)
+                .append(", username='").append(username).append('\'')
+                .append(", email='").append(email).append('\'')
+                .append(", location='").append(location).append('\'')
+                .append(", createdAt=").append(createdAt)
+                .append(", updatedAt=").append(updatedAt)
+                .append('}').toString();
     }
 }

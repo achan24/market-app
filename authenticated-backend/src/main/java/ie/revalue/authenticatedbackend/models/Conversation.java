@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name="conversation_topics")
+@Table(name="conversations")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,21 +19,19 @@ public class Conversation {
     @GeneratedValue
     private Integer id;
 
-    @OneToOne
-    @JoinColumn(name = "listing_id", nullable = false)
-    private Listing listing;
+    @Column(name = "listing_id", nullable = false)
+    private Integer listingId;
 
-    @ManyToOne
-    @JoinColumn(name = "buyer_id", nullable = false)
-    private ApplicationUser buyer;
+    @Column(name = "buyer_id", nullable = false)
+    private Integer buyerId;
 
-    @ManyToOne
-    @JoinColumn(name = "seller_id", nullable = false)
-    private ApplicationUser seller;
+    @Column(name = "seller_id", nullable = false)
+    private Integer sellerId;
 
-    @OneToMany(mappedBy = "conversationTopic", cascade = CascadeType.ALL,
-        orphanRemoval = true)
-    private List<Message> messages;
+    @ElementCollection
+    @CollectionTable(name = "conversation_messages", joinColumns = @JoinColumn(name = "conversation_id"))
+    @Column(name = "message_id")
+    private List<Integer> messageIds;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -51,5 +49,18 @@ public class Conversation {
 
     private boolean isClosed;
 
+
+    @Override
+    public String toString() {
+        return new StringBuilder("Conversation{")
+                .append("id=").append(id)
+                .append(", listingId=").append(listingId != null ? listingId : "null")
+                .append(", buyerId=").append(buyerId != null ? buyerId : "null")
+                .append(", sellerId=").append(sellerId != null ? sellerId : "null")
+                .append(", createdAt=").append(createdAt)
+                .append(", updatedAt=").append(updatedAt)
+                .append(", isClosed=").append(isClosed)
+                .append('}').toString();
+    }
 
 }

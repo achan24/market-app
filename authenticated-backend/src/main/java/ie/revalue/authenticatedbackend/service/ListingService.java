@@ -201,9 +201,9 @@ public class ListingService {
 
         // Create a new conversation
         Conversation conversation = new Conversation();
-        conversation.setListing(listing);
-        conversation.setBuyer(buyer);
-        conversation.setSeller(seller);
+        conversation.setListingId(listing.getId());
+        conversation.setBuyerId(buyer.getUserId());
+        conversation.setSellerId(seller.getUserId());
         conversation.setCreatedAt(LocalDateTime.now());
         conversation.setUpdatedAt(LocalDateTime.now());
         conversation.setClosed(false);

@@ -56,8 +56,8 @@ public class AuthenticationService {
                         0,
                         username,
                         encodedPassword,
-                        "user@user.com",
-                        "Cork",
+                        null,
+                        null,
                         LocalDateTime.now(),
                         LocalDateTime.now(),
                         null,
@@ -87,46 +87,6 @@ public class AuthenticationService {
             System.out.println("Authentication failed for user: " + username + ". Error: " + e.getMessage());
             throw e; // Rethrow the exception
         }
-
-//        try {
-//            System.out.println("inside loginUser - attempting to authenticate " + username);
-//            Authentication auth = authenticationManager.authenticate(
-//                    new UsernamePasswordAuthenticationToken(username, password)
-//            );
-//            System.out.println("passed authentication manager");
-//
-//            String token = tokenService.generateJwt(auth);
-//
-//            return new LoginResponseDTO(userRepository.findByUsername(username).get(), token);
-//        } catch (BadCredentialsException e) {
-//            System.out.println("Invalid credentials for user: " + username);
-//            return new LoginResponseDTO(null, "Invalid username or password");
-//        } catch (LockedException e) {
-//            System.out.println("Account locked for user: " + username);
-//            return new LoginResponseDTO(null, "Account is locked");
-//        } catch (DisabledException e) {
-//            System.out.println("Account disabled for user: " + username);
-//            return new LoginResponseDTO(null, "Account is disabled");
-//        } catch (Exception e) {
-//            System.out.println("Unexpected error during login for user: " + username + ". Error: " + e.getMessage());
-//            return new LoginResponseDTO(null, "An unexpected error occurred");
-//        }
-
-//        } catch (AuthenticationException e) {
-//            System.out.println("Authentication failed for user: " + username);
-//            System.out.println(e);
-//            return new LoginResponseDTO(null, "Authentication failed: " + e.getMessage());
-//        } catch (Exception e) {
-//            System.out.println("Unexpected error during login for user: " + username);
-//            System.out.println(e);
-//            return new LoginResponseDTO(null, "An unexpected error occurred");
-//        }
-
-//        } catch(Exception e) {
-//            System.out.println("Error" + e);
-//            return new LoginResponseDTO(null, "");
-//        }
-
 
     }
 

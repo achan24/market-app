@@ -25,12 +25,7 @@ public class AuthenticationController {
     @Autowired
     private AuthenticationService authenticationService;
 
-    //we need people to access this endpoint even though they aren't authenticated yet
-    //by modifying security filter chain
-//    @PostMapping("/register")
-//    public ApplicationUser registerUser(@RequestBody RegistrationDTO body) {
-//        return authenticationService.registerUser(body.getUsername(),body.getPassword());
-//    }
+
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody RegistrationDTO body) {
         try {
@@ -47,10 +42,7 @@ public class AuthenticationController {
         }
     }
 
-//    @PostMapping("/login")
-//    public LoginResponseDTO loginUser(@RequestBody RegistrationDTO body) {
-//        return authenticationService.loginUser(body.getUsername(),body.getPassword());
-//    }
+
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody RegistrationDTO body) {
@@ -72,25 +64,6 @@ public class AuthenticationController {
             String errorMessage = Optional.ofNullable(e.getMessage()).orElse("An unexpected error occurred");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", errorMessage));
         }
-//        try {
-//            LoginResponseDTO loginResponse = authenticationService.loginUser(body.getUsername(), body.getPassword());
-//            return ResponseEntity.ok(loginResponse);
-//        } catch (BadCredentialsException e) {
-//            return ResponseEntity
-//                    .status(HttpStatus.UNAUTHORIZED)
-//                    .body(Map.of("message", "Invalid username or password"));
-//        } catch (LockedException e) {
-//            return ResponseEntity
-//                    .status(HttpStatus.FORBIDDEN)
-//                    .body(Map.of("message", "Account is locked"));
-//        } catch (DisabledException e) {
-//            return ResponseEntity
-//                    .status(HttpStatus.FORBIDDEN)
-//                    .body(Map.of("message", "Account is disabled"));
-//        } catch (Exception e) {
-//            return ResponseEntity
-//                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(Map.of("message", "An unexpected error occurred"));
-//        }
+
     }
 }

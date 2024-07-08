@@ -7,6 +7,7 @@ import ie.revalue.authenticatedbackend.models.Listing;
 import ie.revalue.authenticatedbackend.models.Message;
 import ie.revalue.authenticatedbackend.service.ConversationService;
 import ie.revalue.authenticatedbackend.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,11 +31,27 @@ public class ConversationController {
     private UserService userService;
 
     @GetMapping
-    public ResponseEntity<?> getUserConversations(@AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<?> getUserConversations(@AuthenticationPrincipal Jwt jwt, HttpServletRequest request) {
         try {
             String username = jwt.getClaimAsString("sub");
+            System.out.println("Username from JWT: " + username);
+
+            // Log request details
+            System.out.println("Request URL: " + request.getRequestURL());
+            System.out.println("Request Method: " + request.getMethod());
+            System.out.println("Request Headers:");
+            request.getHeaderNames().asIterator().forEachRemaining(headerName -> {
+                System.out.println(headerName + ": " + request.getHeader(headerName));
+            });
+            System.out.println("Query Parameters:");
+            request.getParameterMap().forEach((key, value) -> {
+                System.out.println(key + ": " + String.join(", ", value));
+            });
+
             ApplicationUser user = userService.getUserByUsername(username);
+            System.out.println("ApplicationUser: " + user);
             List<Conversation> conversations = conversationService.getUserConversations(user);
+            System.out.println("Conversations: " + conversations);
             return ResponseEntity.ok(conversations);
         } catch (UsernameNotFoundException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");

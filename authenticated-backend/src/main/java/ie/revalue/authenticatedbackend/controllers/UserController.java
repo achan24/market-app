@@ -2,6 +2,7 @@ package ie.revalue.authenticatedbackend.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ie.revalue.authenticatedbackend.models.ApplicationUser;
+import ie.revalue.authenticatedbackend.models.Conversation;
 import ie.revalue.authenticatedbackend.models.UserDetailsDTO;
 import ie.revalue.authenticatedbackend.repository.UserRepository;
 import ie.revalue.authenticatedbackend.service.UserService;
@@ -14,6 +15,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -49,6 +52,9 @@ public class UserController {
             System.out.println("user: " + user);
 
 
+            List<Conversation> userConversations = userService.getAllConversationsForUser(user.getUserId());
+
+
             UserDetailsDTO userDetails = new UserDetailsDTO(
                     user.getUsername(),
                     user.getEmail(),
@@ -56,7 +62,7 @@ public class UserController {
                     user.getCreatedAt(),
                     user.getSellerListingIds(),
                     user.getBuyerListingIds(),
-                    user.getConversations()
+                    userConversations
             );
             System.out.println("user details: " + userDetails);
 

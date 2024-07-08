@@ -9,10 +9,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ConversationRepository extends JpaRepository<Conversation, Integer> {
-    List<Conversation> findByBuyerOrSellerOrderByUpdatedAtDesc(ApplicationUser buyer, ApplicationUser seller);
 
-    Optional<Conversation> findByBuyerAndSeller(ApplicationUser user1, ApplicationUser user2);
 
-    List<Conversation> findAllByBuyerIdOrSellerId(Integer buyerId, Integer sellerId);
-    Conversation findByListingAndBuyerAndSeller(Listing listing, ApplicationUser buyer, ApplicationUser seller);
+    List<Conversation> findByBuyerIdOrSellerId(Integer buyerId, Integer sellerId);
+    List<Conversation> findByBuyerIdOrSellerIdOrderByUpdatedAtDesc(Integer buyerId, Integer sellerId);
+    Optional<Conversation> findByBuyerIdAndSellerId(Integer buyerId, Integer sellerId);
+    Optional<Conversation> findBySellerIdAndBuyerId(Integer sellerId, Integer buyerId);
+
+
 }

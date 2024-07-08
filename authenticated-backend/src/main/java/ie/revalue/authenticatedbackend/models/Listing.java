@@ -53,7 +53,26 @@ public class Listing {
 
     private Double acceptedPrice;
 
-    @OneToOne(mappedBy = "listing")
-    private Conversation conversation;
+    @Column(name = "conversation_id")
+    private Integer conversationId;
+
+
+    @Override
+    public String toString() {
+        return new StringBuilder("Listing{")
+                .append("id=").append(id)
+                .append(", category='").append(category).append('\'')
+                .append(", title='").append(title).append('\'')
+                .append(", description='").append(description).append('\'')
+                .append(", askingPrice=").append(askingPrice)
+                .append(", createdAt=").append(createdAt)
+                .append(", updatedAt=").append(updatedAt)
+                .append(", location='").append(location).append('\'')
+                .append(", sellerId=").append(seller != null ? seller.getUserId() : "null")
+                .append(", buyerId=").append(buyer != null ? buyer.getUserId() : "null")
+                .append(", acceptedPrice=").append(acceptedPrice)
+                .append(", conversationId=").append(conversationId != null ? conversationId : "null")
+                .append('}').toString();
+    }
 
 }

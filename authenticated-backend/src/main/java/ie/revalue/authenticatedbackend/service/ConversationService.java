@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,58 +33,78 @@ public class ConversationService {
 
 
     public Conversation getOrCreateConversation(ApplicationUser user1, ApplicationUser user2) {
-        Conversation conversation = conversationRepository.findByBuyerAndSeller(user1, user2)
-                .orElse(conversationRepository.findByBuyerAndSeller(user2, user1)
-                        .orElse(null));
+        Integer user1Id = user1.getUserId();
+        Integer user2Id = user2.getUserId();
 
-        if (conversation == null) {
-            conversation = new Conversation();
-            conversation.setBuyer(user1);
-            conversation.setSeller(user2);
-            conversation = conversationRepository.save(conversation);
+        Optional<Conversation> optionalConversation = conversationRepository.findByBuyerIdAndSellerId(user1Id, user2Id)
+                .or(() -> conversationRepository.findBySellerIdAndBuyerId(user1Id, user2Id));
+
+        if (optionalConversation.isPresent()) {
+            return optionalConversation.get();
+        } else {
+            Conversation conversation = new Conversation();
+            conversation.setBuyerId(user1Id);
+            conversation.setSellerId(user2Id);
+            conversation.setCreatedAt(LocalDateTime.now());
+            conversation.setUpdatedAt(LocalDateTime.now());
+            conversation.setClosed(false);
+
+            return conversationRepository.save(conversation);
         }
-
-        return conversation;
     }
+
 
     public List<Conversation> getUserConversations(ApplicationUser user) {
-        return conversationRepository.findByBuyerOrSellerOrderByUpdatedAtDesc(user, user);
+        // Assuming you have methods to find by buyerId or sellerId
+        return conversationRepository.findByBuyerIdOrSellerId(user.getUserId(), user.getUserId());
     }
 
-    public List<Message> getConversationMessages(Integer conversationTopicId) {
-        Conversation topic = conversationRepository.findById(conversationTopicId)
-                .orElseThrow(() -> new ResourceNotFoundException("Conversation not found"));
-        return messageRepository.findByConversationTopicOrderByTimestampAsc(topic);
-    }
 
-    public Message sendMessage(Integer conversationTopicId, ApplicationUser sender, String content) {
-        Conversation topic = conversationRepository.findById(conversationTopicId)
+    public Message sendMessage(Integer conversationId, ApplicationUser sender, String content) {
+        // Fetch the conversation by its ID
+        Conversation conversation = conversationRepository.findById(conversationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Conversation not found"));
 
+        // Create and populate a new Message object
         Message message = new Message();
-        message.setConversationTopic(topic);
-        message.setSender(sender);
+        message.setConversationId(conversationId);
+        message.setSenderId(sender.getUserId()); // Assuming sender has a getId() method
         message.setContent(content);
 
+        // Save the message to the database
         message = messageRepository.save(message);
 
+        // Update the conversation's messageIds list
+        List<Integer> messageIds = conversation.getMessageIds();
+        messageIds.add(message.getId());
+        conversation.setMessageIds(messageIds);
+
         // Update the conversation's last update time
-        topic.setUpdatedAt(LocalDateTime.now());
-        conversationRepository.save(topic);
+        conversation.setUpdatedAt(LocalDateTime.now());
+        conversationRepository.save(conversation);
 
         return message;
     }
 
     public List<Message> getConversationMessages(Integer conversationId, ApplicationUser user) {
-        Conversation conversation = getConversation(conversationId, user);
-        return messageRepository.findByConversationTopicOrderByTimestampAsc(conversation);
+        // Fetch the conversation by its ID
+        Conversation conversation = conversationRepository.findById(conversationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Conversation not found"));
+
+        // Check if the user is part of the conversation (either buyer or seller)
+        if (!conversation.getBuyerId().equals(user.getUserId()) && !conversation.getSellerId().equals(user.getUserId())) {
+            throw new AccessDeniedException("Access denied: User is not part of this conversation");
+        }
+
+        // Fetch and return the messages ordered by timestamp
+        return messageRepository.findByConversationIdOrderByTimestampAsc(conversationId);
     }
 
     private Conversation getConversation(Integer conversationId, ApplicationUser user) {
         Conversation conversation = conversationRepository.findById(conversationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Conversation not found"));
 
-        if (!conversation.getBuyer().equals(user) && !conversation.getSeller().equals(user)) {
+        if (!conversation.getBuyerId().equals(user.getUserId()) && !conversation.getSellerId().equals(user.getUserId())) {
             throw new AccessDeniedException("You don't have permission to access this conversation");
         }
 
@@ -104,12 +125,15 @@ public class ConversationService {
 
         List<Listing> inboxListings = new ArrayList<>();
         inboxListings.addAll(sellerListings.stream()
-                .filter(listing -> listing.getConversation() != null)
+                .filter(listing -> listing.getConversationId() != null)
                 .collect(Collectors.toList()));
-        inboxListings.addAll(buyerListings);
+        inboxListings.addAll(buyerListings.stream()
+                .filter(listing -> listing.getConversationId() != null)
+                .collect(Collectors.toList()));
 
         return inboxListings;
     }
+
 
 
     public Conversation getListingConversation(Integer listingId, ApplicationUser user) {
@@ -117,11 +141,18 @@ public class ConversationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Listing not found"));
 
         // Check if the user is either the buyer or seller
-        if (!listing.getSeller().equals(user) && !listing.getBuyer().equals(user)) {
+        if (!listing.getSeller().getUserId().equals(user.getUserId()) &&
+                !listing.getBuyer().getUserId().equals(user.getUserId())) {
             throw new AccessDeniedException("User is not authorized to access this conversation");
         }
 
-        return listing.getConversation();
+        Integer conversationId = listing.getConversationId();
+        if (conversationId == null) {
+            throw new ResourceNotFoundException("Conversation not found for this listing");
+        }
+
+        return conversationRepository.findById(conversationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Conversation not found"));
     }
 
 
@@ -131,26 +162,29 @@ public class ConversationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Listing not found"));
 
         // Check if the user is the seller
-        if (!listing.getSeller().equals(user)) {
+        if (!listing.getSeller().getUserId().equals(user.getUserId())) {
             throw new AccessDeniedException("Only the seller can create a conversation");
         }
 
         // Check if a conversation already exists
-        if (listing.getConversation() != null) {
+        if (listing.getConversationId() != null) {
             throw new IllegalStateException("A conversation already exists for this listing");
         }
 
         // Create new conversation
         Conversation conversation = new Conversation();
-        conversation.setListing(listing);
-        conversation.setBuyer(listing.getBuyer());
-        conversation.setSeller(listing.getSeller());
+        conversation.setListingId(listing.getId());
+        conversation.setBuyerId(listing.getBuyer() != null ? listing.getBuyer().getUserId() : null);
+        conversation.setSellerId(listing.getSeller().getUserId());
+        conversation.setCreatedAt(LocalDateTime.now());
+        conversation.setUpdatedAt(LocalDateTime.now());
+        conversation.setClosed(false);
 
         // Save the conversation
         conversation = conversationRepository.save(conversation);
 
-        // Update the listing with the new conversation
-        listing.setConversation(conversation);
+        // Update the listing with the new conversation ID
+        listing.setConversationId(conversation.getId());
         listingRepository.save(listing);
 
         return conversation;

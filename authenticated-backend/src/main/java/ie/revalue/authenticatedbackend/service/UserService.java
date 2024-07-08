@@ -81,6 +81,8 @@ public class UserService implements UserDetailsService {
 //        return allConversations;
 //    }
     public List<Conversation> getAllConversationsForUser(Integer userId) {
-        return conversationRepository.findAllByBuyerIdOrSellerId(userId, userId);
+        return conversationRepository.findByBuyerIdOrSellerId(userId, userId);
     }
+
+
 }
