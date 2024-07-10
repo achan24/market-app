@@ -65,6 +65,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/auth/**").permitAll(); //allow all to this endpoint
                     auth.requestMatchers(HttpMethod.GET, "/api/v1/listings/**").permitAll(); // Allow GET requests to this endpoint without authentication
+                    //auth.requestMatchers("/api/paypal-client-id").authenticated(); // Require authentication for PayPal client ID endpoint
                     auth.requestMatchers("/admin/**").hasRole("ADMIN");
                     auth.requestMatchers("/user/**").hasAnyRole("ADMIN", "USER");
                     auth.requestMatchers("/api/v1/conversations/**").authenticated();

@@ -155,7 +155,7 @@ const Inbox = () => {
 
   return (
     <div className="container mx-auto p-4 font-sans">
-      <h1 className="text-2xl font-bold mb-4">Inbox</h1>
+      <h1 className="text-2xl font-bold mb-4">{user.username}'s Inbox</h1>
       <div className="flex bg-gray-100 rounded-lg shadow">
         {/* Conversation List */}
         <div className="w-1/3 border-r border-gray-300 p-4 overflow-y-auto max-h-[80vh]">

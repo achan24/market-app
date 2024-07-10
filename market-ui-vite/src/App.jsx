@@ -16,6 +16,7 @@ import CardListing from './components/CardListing'
 import ListingPage from './components/ListingPage'
 import UserProfile from './components/UserProfile'
 import Inbox from './components/Inbox'
+import PaymentForm from './components/PaymentForm'
 
 
 
@@ -74,6 +75,7 @@ function App() {
           <Route path='/listing/:id' element={<ListingPage />} />
           <Route path='/user/:user' element={<UserProfile />} />
           <Route path='/inbox' element={<Inbox />} />
+          <Route path='/payment/:id' element={<PaymentForm />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

@@ -5,15 +5,22 @@ import { useNavigate } from 'react-router-dom';
 
 const UserProfile = () => {
   const { user: authUser, token } = useAuth();
-  const [userDetails, setUserDetails] = useState(null);
+  const [userDetails, setUserDetails] = useState({
+    username: '',
+    email: '',
+    location: '',
+    createdAt: null
+  });
   const [isEditing, setIsEditing] = useState(false);
-  const [editedDetails, setEditedDetails] = useState({});
-  const navigate = useNavigate()
+  const [editedDetails, setEditedDetails] = useState({
+    email: '',
+    location: ''
+  });
+  const navigate = useNavigate();
 
-  
   useEffect(() => {
     console.log("UserProfile component: authUser object", authUser);
-    
+
     const fetchUserDetails = async () => {
       if (!token) {
         console.error('No token found');
@@ -24,19 +31,13 @@ const UserProfile = () => {
         const response = await fetch(`http://localhost:8000/user/${authUser.username}`, {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` // Use the token from the auth context
+            'Authorization': `Bearer ${token}`
           }
         });
         if (response.ok) {
-          const text = await response.text(); // Get the raw text of the response
-          console.log('Raw response:', text);
-          try {
-            const data = JSON.parse(text); // Try to parse it as JSON
-            console.log(data)
-            setUserDetails(data);
-          } catch (parseError) {
-            console.error('Error parsing JSON:', parseError);
-          }
+          const data = await response.json();
+          console.log(data);
+          setUserDetails(data);
         } else {
           console.error('Failed to fetch user details, status:', response.status);
         }
@@ -52,7 +53,10 @@ const UserProfile = () => {
 
   const handleEdit = () => {
     setIsEditing(true);
-    setEditedDetails({ ...userDetails });
+    setEditedDetails({
+      email: userDetails.email || '',
+      location: userDetails.location || ''
+    });
   };
 
   const handleChange = (e) => {
@@ -68,11 +72,18 @@ const UserProfile = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(editedDetails)
+        body: JSON.stringify({
+          email: editedDetails.email,
+          location: editedDetails.location
+        })
       });
 
       if (response.ok) {
-        setUserDetails(editedDetails);
+        setUserDetails(prev => ({
+          ...prev,
+          email: editedDetails.email,
+          location: editedDetails.location
+        }));
         setIsEditing(false);
       } else {
         console.error('Failed to update user details');
@@ -83,32 +94,21 @@ const UserProfile = () => {
   };
 
   const inboxPage = () => {
-    navigate('/inbox')
-  }
+    navigate('/inbox');
+  };
 
-  if (!userDetails) {
+  if (!userDetails.username) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 
- 
-  const  formattedDate = userDetails.createdAt !== null ? new Date(userDetails.createdAt).toLocaleDateString() : 'N/A';
+  const formattedDate = userDetails.createdAt ? new Date(userDetails.createdAt).toLocaleDateString() : 'N/A';
 
   return (
     <div className="container mx-auto p-4 font-sans bg-gray-100 min-h-screen">
       <div className="bg-white rounded-lg shadow-md p-8 mb-6">
         <div className="flex flex-col md:flex-row justify-between items-start mb-6">
           <div>
-            {isEditing ? (
-              <input
-                type="text"
-                name="username"
-                value={editedDetails.username}
-                onChange={handleChange}
-                className="text-3xl font-bold text-gray-800 mb-2 border-b-2 border-gray-300 focus:outline-none focus:border-orange-500"
-              />
-            ) : (
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">{userDetails.username}</h1>
-            )}
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">{userDetails.username}</h1>
             <p className="text-gray-600 flex items-center">
               <MapPin size={18} className="mr-2" />
               {isEditing ? (

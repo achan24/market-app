@@ -16,7 +16,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
@@ -80,6 +82,69 @@ public class UserController {
     }
 
 
+    @PutMapping("/{username}")
+    public ResponseEntity<?> updateUserDetails(@PathVariable String username, @RequestBody Map<String, String> updates, @AuthenticationPrincipal Jwt jwt) {
+        String tokenUsername = jwt.getClaimAsString("sub");
+        System.out.println("JWT token username: " + tokenUsername);
+        System.out.println("Requested username: " + username);
+
+        if (!tokenUsername.equals(username)) {
+            System.out.println("Access denied: JWT token username does not match the requested username.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied");
+        }
+
+        try {
+            ApplicationUser user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+            System.out.println("User before update: " + user);
+
+            String newEmail = updates.get("email");
+            String newLocation = updates.get("location");
+
+            if (newEmail != null) {
+                user.setEmail(newEmail);
+            }
+            if (newLocation != null) {
+                user.setLocation(newLocation);
+            }
+
+            userRepository.save(user);
+            System.out.println("User after update: " + user);
+
+            return ResponseEntity.ok("User details updated successfully");
+        } catch (UsernameNotFoundException e) {
+            System.out.println("User not found: " + username);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found: " + username);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error updating user details: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/email/{username}")
+    public ResponseEntity<?> getUserEmail(@PathVariable String username, @AuthenticationPrincipal Jwt jwt) {
+        String tokenUsername = jwt.getClaimAsString("sub");
+        System.out.println("JWT token username: " + tokenUsername);
+        System.out.println("Requested username: " + username);
+
+        // Allow fetching email if the user is authenticated
+        if (tokenUsername == null) {
+            System.out.println("Access denied: No JWT token provided.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied");
+        }
+
+        try {
+            ApplicationUser user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+            return ResponseEntity.ok(Collections.singletonMap("email", user.getEmail()));
+        } catch (UsernameNotFoundException e) {
+            System.out.println("User not found: " + username);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found: " + username);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error fetching user email: " + e.getMessage());
+        }
+    }
 
 
 }
