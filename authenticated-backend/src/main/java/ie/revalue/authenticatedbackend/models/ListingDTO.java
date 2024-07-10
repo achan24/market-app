@@ -23,4 +23,5 @@ public class ListingDTO {
     private String buyerName;
     private Double acceptedPrice;
     private LocalDateTime createdAt;
+    private ListingStatus status;
 }

@@ -120,6 +120,7 @@ public class ListingService {
         listingDTO.setBuyerName(listing.getBuyer() != null ? listing.getBuyer().getUsername() : null); // Set the buyer's name
         listingDTO.setAcceptedPrice(listing.getAcceptedPrice()); // Set the accepted price
         listingDTO.setCreatedAt(listing.getCreatedAt());
+        listingDTO.setStatus(listing.getStatus());
         return listingDTO;
     }
 
@@ -215,6 +216,14 @@ public class ListingService {
     }
 
 
+    @Transactional
+    public void updateListingStatus(Integer listingId, ListingStatus status) {
+        Listing listing = listingRepository.findById(listingId)
+                .orElseThrow(() -> new RuntimeException("Listing not found"));
+        listing.setStatus(status);
+        listingRepository.save(listing);
+    }
+
 
     private ListingDTO convertToDTO(Listing listing) {
         ListingDTO dto = new ListingDTO(
@@ -228,7 +237,8 @@ public class ListingService {
                 listing.getSeller() != null ? listing.getSeller().getUsername() : null,
                 listing.getBuyer() != null ? listing.getBuyer().getUsername() : null,
                 listing.getAcceptedPrice() != null ? listing.getAcceptedPrice() : null,
-                listing.getCreatedAt()
+                listing.getCreatedAt(),
+                listing.getStatus() != null ? listing.getStatus() : null
         );
 
         if (listing.getImages() != null) {

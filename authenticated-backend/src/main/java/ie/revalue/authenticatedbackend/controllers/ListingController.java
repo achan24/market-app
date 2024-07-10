@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -70,7 +68,8 @@ public class ListingController {
                 listing.getSeller() != null ? listing.getSeller().getUsername() : null,
                 listing.getBuyer() != null ? listing.getBuyer().getUsername() : null,
                 listing.getAcceptedPrice() != null ? listing.getAcceptedPrice() : null,
-                listing.getCreatedAt()
+                listing.getCreatedAt(),
+                listing.getStatus() != null ? listing.getStatus() : null
         );
 
         if (listing.getImages() != null) {
@@ -165,6 +164,12 @@ public class ListingController {
     public ResponseEntity<ListingDTO> acceptOffer(@PathVariable Integer id, @RequestBody AcceptOfferRequest request) {
         ListingDTO updatedListing = listingService.acceptOffer(id, request);
         return ResponseEntity.ok(updatedListing);
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateListingStatus(@PathVariable Integer id, @RequestParam ListingStatus status) {
+        listingService.updateListingStatus(id, status);
+        return ResponseEntity.ok().build();
     }
 
 

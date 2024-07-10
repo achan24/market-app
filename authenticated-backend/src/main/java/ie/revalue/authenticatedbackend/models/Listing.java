@@ -30,6 +30,7 @@ public class Listing {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+        status = ListingStatus.ACTIVE;
     }
 
     private LocalDateTime updatedAt;
@@ -56,6 +57,9 @@ public class Listing {
     @Column(name = "conversation_id")
     private Integer conversationId;
 
+    @Enumerated(EnumType.STRING)
+    private ListingStatus status;
+
 
     @Override
     public String toString() {
@@ -72,6 +76,7 @@ public class Listing {
                 .append(", buyerId=").append(buyer != null ? buyer.getUserId() : "null")
                 .append(", acceptedPrice=").append(acceptedPrice)
                 .append(", conversationId=").append(conversationId != null ? conversationId : "null")
+                .append(", status='").append(status).append('\'')
                 .append('}').toString();
     }
 

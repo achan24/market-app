@@ -231,74 +231,7 @@ const Register = () => {
 </div>
 
 
-    // <div className="flex items-center justify-center min-h-screen bg-gray-100">
-    //   <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
-    //     <h1 className='my-12 text-2xl'>{registerMode ? 'Register' : 'Login'}</h1>
-    //     <Input 
-    //       className="mx-auto w-64 md:w-1/3" 
-    //       type="text"
-    //       value={username}
-    //       onChange={e => setUsername(e.target.value)}
-    //       placeholder="Username"
-    //     />
-    //     <Input 
-    //       className="mx-auto my-8 w-64 md:w-1/3" 
-    //       type="password"
-    //       value={password}
-    //       onChange={e => setPassword(e.target.value)}
-    //       placeholder="Password"
-    //     />
-    //     <div className=''>
-    //       <Button 
-    //         className="mx-8 "
-    //         onClick={handleSubmit}
-    //         disabled={isDisabled}
-    //       >
-    //         {registerMode ? 'Register' : 'Login'}
-    //       </Button> 
-    //       <Button 
-    //         className="mx-8 "
-    //         onClick={()=>
-    //           {
-    //             setEmail('')
-    //             setPassword('')
-    //             navigate('/')
-    //           }
-    //         }
-    //       >
-    //           Cancel
-    //       </Button> 
-    //       {!registerMode &&
-    //         (<p className='my-8 text-sm'>Not a member? &nbsp;
-    //           <a href='' 
-    //             className=' text-blue-500 hover:font-bold' 
-    //             onClick={(e) => {
-    //               e.preventDefault()
-    //               setRegisterMode(true)}}
-    //               >
-    //             Sign up
-    //           </a>
-    //           </p>)
-    //       }
-    //       {showPopup && (
-    //         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-    //             <div className="bg-white p-4 rounded-lg shadow-lg px-16 py-16">
-    //                 <p className='text-lg my-5'>{username}, you have successfully {registerMode ? 'registered!' : 'logged in!'}</p>
-    //                 <p className='text-xs'>Please wait while we return you to the home page...</p>
-    //             </div>
-    //         </div>
-    //       )}
-    //       {showErrorMessage && (
-    //         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-    //             <div className="bg-white p-4 rounded-lg shadow-lg px-16 py-16">
-    //                 <p className='text-lg my-5'>{errorMessage}</p>
-                    
-    //             </div>
-    //         </div>
-    //       )}
-    //     </div>
-    //   </div>
-    // </div>
+
   )
 }
 

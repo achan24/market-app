@@ -265,50 +265,57 @@ const ListingPage = () => {
 
                   {comment.comment?.startsWith("OFFER:") && (
                     <>
-                      {listing.buyerName && listing.buyerName === comment.username && listing.acceptedPrice != null ? (
+                      {listing.status === 'SOLD' ? (
+                        <p className="text-green-500 text-lg">Sold</p>
+                      ) : (
                         <>
-                          <p className="text-green-500 text-lg">Offer Accepted</p>
-                          {user.username === comment.username && paypalClientId && sellerEmail && (
-                            <div className="w-full max-w-xs">
-                              <PayPalButtons
-                                style={{
-                                  layout: 'vertical',
-                                  color: 'gold',
-                                  shape: 'rect',
-                                  label: 'paypal',
-                                  height: 55,
-                                }}
-                                createOrder={(data, actions) => {
-                                  return actions.order.create({
-                                    purchase_units: [{
-                                      amount: {
-                                        value: listing.acceptedPrice.toString(),
-                                        currency_code: 'EUR'
-                                      },
-                                      payee: {
-                                        email_address: sellerEmail
-                                      },
-                                      description: listing.title
-                                    }]
-                                  });
-                                }}
-                                onApprove={(data, actions) => {
-                                  return actions.order.capture().then((details) => {
-                                    alert('Transaction completed by ' + details.payer.name.given_name);
-                                    navigate(`/payment-success/${listing.id}`);
-                                  });
-                                }}
-                              />
-                            </div>
+                          {listing.buyerName && listing.buyerName === comment.username && listing.acceptedPrice != null ? (
+                            <>
+                              <p className="text-green-500 text-lg">Offer Accepted</p>
+                              {user.username === comment.username && paypalClientId && sellerEmail && (
+                                <div className="w-full max-w-xs">
+                                  <PayPalButtons
+                                    style={{
+                                      layout: 'vertical',
+                                      color: 'gold',
+                                      shape: 'rect',
+                                      label: 'paypal',
+                                      height: 40,
+                                    }}
+                                    createOrder={(data, actions) => {
+                                      return actions.order.create({
+                                        purchase_units: [{
+                                          amount: {
+                                            value: listing.acceptedPrice.toString(),
+                                            currency_code: 'EUR'
+                                          },
+                                          payee: {
+                                            email_address: sellerEmail
+                                          },
+                                          description: listing.title
+                                        }]
+                                      });
+                                    }}
+                                    onApprove={(data, actions) => {
+                                      return actions.order.capture().then((details) => {
+                                        //alert('Transaction completed by ' + details.payer.name.given_name);
+                                        navigate(`/payment-success/${listing.id}`, { state: { title: listing.title } });
+                                      });
+                                    }}
+                                  />
+                                </div>
+                              )}
+                            </>
+                          ) : (
+                            isAuthenticated && user.username === listing.sellerName && (
+                              <Button onClick={() => handleAcceptOffer(comment)}>Accept Offer</Button>
+                            )
                           )}
                         </>
-                      ) : (
-                        isAuthenticated && user.username === listing.sellerName && (
-                          <Button onClick={() => handleAcceptOffer(comment)}>Accept Offer</Button>
-                        )
                       )}
                     </>
                   )}
+
 
                 </div>
               </div>
@@ -332,3 +339,5 @@ const ListingPage = () => {
 };
 
 export default ListingPage;
+
+
