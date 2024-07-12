@@ -107,8 +107,13 @@ public class ListingController {
 //
 
     @GetMapping
-    public ResponseEntity<List<ListingDTO>> getAllListings() {
-        List<Listing> listings = listingService.getAllListings();
+    public ResponseEntity<List<ListingDTO>> getAllListings(
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) String price) {
+
+        List<Listing> listings = listingService.searchListings(query, category, location, price);
         List<ListingDTO> listingDTOs = listings.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());

@@ -26,7 +26,6 @@ const Home = () => {
       console.log('Error fetching listings', err)
     }
   }
-  // fetchData()
   
   useEffect(() => {
     const getProducts = async () => {
@@ -43,132 +42,69 @@ const Home = () => {
     getProducts();
   }, []);
   
-  // Safe logging
   console.log(`Authentication status: ${isAuthenticated}`)
   if (user) {
     console.log(`User details: ${JSON.stringify(user)}`)
   } else {
     console.log('No user logged in')
   }
-  
-  const login = () => {
-    navigate('/login')
-  }
 
-
-  const logOut = () => {
-    
-    logout()
-    navigate('/')
-  }
-
-  const placeAd = () => {
-    //check if user is logged in
-    //or maybe only show if user is logged in
-    if(isAuthenticated)
-      navigate('/createListing')
-  }
-
-  const dummyData = [
-    {
-      title: "Vintage Wooden Coffee Table",
-      askingPrice: "120",
-      location: "San Francisco, CA",
-      image: "https://i.etsystatic.com/10486522/r/il/d0dd93/1816412232/il_fullxfull.1816412232_g98w.jpg",
-      description: "A beautifully crafted vintage wooden coffee table, perfect for adding a rustic touch to your living room. Dimensions: 48\" L x 24\" W x 18\" H.",
-      seller: "John Doe",
-      postedTime: "2 hours ago"
+  const slides = [
+    { 
+      image: "https://i.postimg.cc/NMgTbKhr/Furniture3.jpg", 
+      text: "Breathing new life into pre-loved items" 
     },
-    // Duplicate the same data or create variations
-    {
-      title: "Modern Art Piece",
-      askingPrice: "250",
-      location: "New York, NY",
-      image: "https://doagahehoc242.cloudfront.net/uploads/posts/726/5040b61f_piet-mondrian-composition-c-noiii-with-red-yellow-and-blue-900.jpeg",
-      description: "A vibrant modern art piece to elevate your interior decor. Dimensions: 36\" H x 24\" W.",
-      seller: "Jane Smith",
-      postedTime: "3 hours ago"
+    { 
+      image: "https://i.postimg.cc/ydV2QP92/Jars-Clocks.jpg", 
+      text: "Yesterday's gems are tomorrow's treasures" 
     },
-    {
-      title: "Antique Vase",
-      askingPrice: "90",
-      location: "Los Angeles, CA",
-      image: "https://eg6dnc6a5nx.exactdn.com/wp-content/uploads/2020/07/1017-1.jpeg",
-      description: "A delicate antique vase from the 19th century. Perfect for collectors.",
-      seller: "Alice Brown",
-      postedTime: "4 hours ago"
+    { 
+      image: "https://i.postimg.cc/4dBqr9Qy/Reimagine.jpg", 
+      text: "Reimagine, Reuse, Revalue" 
     },
-    {
-      title: "Handmade Rug",
-      askingPrice: "300",
-      location: "Chicago, IL",
-      image: "https://classicworldrugs.com/cdn/shop/products/classic-world-rugs-cwral-3060-005_1024x1024@2x.jpg",
-      description: "A beautiful handmade rug that adds warmth and comfort to any room.",
-      seller: "Robert Johnson",
-      postedTime: "5 hours ago"
-    },
-    {
-      title: "Luxury Watch",
-      askingPrice: "500",
-      location: "Miami, FL",
-      image: "https://globalboutique.com/wp-content/uploads/2023/05/featured-gold-watches-800x600.jpg",
-      description: "A luxury watch that combines elegance and functionality. Perfect for any occasion.",
-      seller: "Michael Williams",
-      postedTime: "6 hours ago"
-    }
   ];
-
-  const handleUsernameClick = () => {
-    console.log(user)
-    console.log(user.username)
-    navigate(`/user/${user.username}`)
-  }
-  
 
   return (
     <div className="font-sans">
+    
 
       {/* Navigation */}
-      <nav className="bg-gray-100 p-2 flex justify-center space-x-4">
-        <button className="text-gray-700 hover:bg-gray-200 rounded-full px-4 py-2">Motors</button>
-        <button className="text-gray-700 hover:bg-gray-200 rounded-full px-4 py-2">Electronics & Media</button>
-        <button className="text-gray-700 hover:bg-gray-200 rounded-full px-4 py-2">Hobbies & Lifestyle</button>
-        <button className="text-gray-700 hover:bg-gray-200 rounded-full px-4 py-2">Fashion & Beauty</button>
-        <button className="text-gray-700 hover:bg-gray-200 rounded-full px-4 py-2">Home & Living</button>
-        {/* <button className="text-gray-700">Gift Cards</button> */}
-      </nav>
+        <nav className="bg-gray-100 p-2 flex justify-center space-x-4">
+          <button className="text-gray-700 hover:bg-gray-200 rounded-full px-4 py-2">Motors</button>
+          <button className="text-gray-700 hover:bg-gray-200 rounded-full px-4 py-2">Electronics & Media</button>
+          <button className="text-gray-700 hover:bg-gray-200 rounded-full px-4 py-2">Hobbies & Lifestyle</button>
+          <button className="text-gray-700 hover:bg-gray-200 rounded-full px-4 py-2">Fashion & Beauty</button>
+          <button className="text-gray-700 hover:bg-gray-200 rounded-full px-4 py-2">Home & Living</button>
+        </nav>
+
+      {/* Hero Carousel */}
+      <div className="carousel w-full h-80 mb-8 relative">
+        {slides.map((slide, index) => (
+          <div id={`slide${index + 1}`} className="carousel-item relative w-full h-full" key={index}>
+            <img src={slide.image} className="w-full object-cover h-full" alt={`Slide ${index + 1}`} />
+            <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2">
+              <h2 className="text-5xl font-extrabold text-center text-white" style={{ textShadow: '3px 3px 6px #000, -3px -3px 6px #000, 3px -3px 6px #000, -3px 3px 6px #000' }}>
+                {slide.text}
+              </h2>
+            </div>
+            <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
+              <a href={`#slide${index === 0 ? slides.length : index}`} className="btn btn-circle">❮</a>
+              <a href={`#slide${index === slides.length - 1 ? 1 : index + 2}`} className="btn btn-circle">❯</a>
+            </div>
+          </div>
+        ))}
+      </div>
 
       {/* Main Content */}
       <main className="container mx-auto mt-8">
-        {/* <h1 className="text-3xl font-bold text-center mb-8">
-          Shop from talented creators and curators!
-        </h1>
-
-        
-        <div className="grid grid-cols-6 gap-4 mb-12">
-          {['Back-to-School Savings', 'Birthday Gifts', 'Wedding Gifts', 'Home Gifts', 'Garden & Floral Gifts', 'Up to 30% Off'].map((category, index) => (
-            <div key={index} className="text-center">
-              <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-2"></div>
-              <p className="text-sm">{category}</p>
-            </div>
-          ))}
-        </div> */}
-
-
-        {/* <h2 className="text-2xl font-bold mb-4">Static Dummy Data Card List</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {dummyData.map((product, index) => (
-            <CardListing key={index} product={product} />
-          ))}
-        </div> */}
-
         {loading ?
           <div>Loading...</div> : (
           <div>
             <h2 className="text-2xl font-bold mb-4">Live Data Card List</h2>
             <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {products.map((product, index) => (
-                <CardListing key={index} product={product} />
+                <CardListing key={index} product={product} className="transform transition-transform duration-200 hover:scale-105
+                hover:shadow-lg hover:border-gray-400"/>
               ))}
             </div>
           </div>

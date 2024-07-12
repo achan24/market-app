@@ -132,9 +132,8 @@ public class ListingService {
         );
     }
 
-    //    public Listing getListingById(Integer id) {
-//        return listingRepository.findById(id).orElse(null);
-//    }
+
+
     public void addComment(Integer listingId, String text, Jwt jwt) {
 
         Listing listing = listingRepository.findById(listingId)
@@ -153,8 +152,6 @@ public class ListingService {
 
         commentRepository.save(comment);
 
-
-
     }
 
 
@@ -167,21 +164,27 @@ public class ListingService {
     }
 
 
-//    public ListingDTO acceptOffer(Integer listingId, AcceptOfferRequest request) {
-//        Listing listing = listingRepository.findById(listingId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Listing not found"));
-//
-//        ApplicationUser buyer = userRepository.findByUsername(request.getBuyerUsername())
-//                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-//
-//        listing.setBuyer(buyer);
-//        listing.setAcceptedPrice(request.getAcceptedPrice());
-//        listing.setUpdatedAt(LocalDateTime.now());
-//
-//        listingRepository.save(listing);
-//
-//        return convertToDTO(listing);
-//    }
+    public List<Listing> searchListings(String query, String category, String location, String price) {
+        // Implement search logic here
+        // For simplicity, we'll create a basic example using Java streams.
+        // Ideally, you'd use JPA Specifications or QueryDSL for a more efficient implementation.
+
+        List<Listing> allListings = listingRepository.findAll(); // Assume this fetches all listings
+
+        return allListings.stream()
+                .filter(listing -> query == null || listing.getTitle().toLowerCase().contains(query.toLowerCase()) || listing.getDescription().toLowerCase().contains(query.toLowerCase()))
+                .filter(listing -> category == null || listing.getCategory().equalsIgnoreCase(category))
+                .filter(listing -> location == null || listing.getLocation().equalsIgnoreCase(location))
+                .filter(listing -> {
+                    if (price == null) return true;
+                    String[] priceRange = price.split("-");
+                    double minPrice = Double.parseDouble(priceRange[0]);
+                    double maxPrice = priceRange.length > 1 ? Double.parseDouble(priceRange[1]) : Double.MAX_VALUE;
+                    return listing.getAskingPrice() >= minPrice && listing.getAskingPrice() <= maxPrice;
+                })
+                .collect(Collectors.toList());
+    }
+
 
     @Transactional
     public ListingDTO acceptOffer(Integer listingId, AcceptOfferRequest request) {

@@ -19,6 +19,8 @@ import Inbox from './components/Inbox'
 import PaymentForm from './components/PaymentForm'
 import PaymentSuccess from './components/PaymentSuccess'
 import Navbar from './components/Navbar'
+import SearchPage from './components/SearchPage'
+import ImageAnalysis from './components/ImageAnalysis'
 
 
 
@@ -42,6 +44,8 @@ function App() {
           <Route path='/inbox' element={<Inbox />} />
           <Route path='/payment/:id' element={<PaymentForm />} />
           <Route path='/payment-success/:id' element={<PaymentSuccess />} />
+          <Route path='/search/' element={<SearchPage />} />
+          <Route path='/vision/' element={<ImageAnalysis />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

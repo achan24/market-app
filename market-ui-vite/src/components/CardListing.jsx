@@ -9,15 +9,7 @@ import { formatDistanceToNow } from 'date-fns'
 
 const CardListing = (props) => {
   const data = props.product
-  // const data = {
-  //   title: "Vintage Wooden Coffee Table",
-  //   price: "120",
-  //   location: "San Francisco, CA",
-  //   image: "https://i.etsystatic.com/10486522/r/il/d0dd93/1816412232/il_fullxfull.1816412232_g98w.jpg", // Placeholder image URL
-  //   description: "A beautifully crafted vintage wooden coffee table, perfect for adding a rustic touch to your living room. Dimensions: 48\" L x 24\" W x 18\" H.",
-  //   seller: "John Doe",
-  //   postedTime: "2 hours ago"
-  // };
+
   const firstImage = data.images && data.images.length > 0 ? `data:${data.images[0].fileType};base64,${data.images[0].data}` : null;
   
   const relativeTime = data.createdAt 
@@ -28,13 +20,10 @@ const CardListing = (props) => {
     ? relativeTime.slice(6)
     : relativeTime
 
-  // console.log(data)
-  // console.log(shortRelativeTime)
 
   return (
     <Link to={`/listing/${data.id}`}>
-      <Card className="w-[300px] transform transition-transform duration-200 hover:scale-105
-      hover:shadow-lg hover:border-gray-400 border border-gray-300">
+      <Card className="w-[300px] border border-gray-300">
         <CardHeader>
           {/* Probably change this afterwards */}
           <img src={firstImage!==null?firstImage:data.image} alt={data.title} className="w-full h-48 object-cover rounded-md border" />

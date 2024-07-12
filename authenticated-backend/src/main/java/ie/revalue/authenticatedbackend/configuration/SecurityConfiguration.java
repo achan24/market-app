@@ -69,6 +69,7 @@ public class SecurityConfiguration {
                     auth.requestMatchers("/admin/**").hasRole("ADMIN");
                     auth.requestMatchers("/user/**").hasAnyRole("ADMIN", "USER");
                     auth.requestMatchers("/api/v1/conversations/**").authenticated();
+                    auth.requestMatchers("/vision/analyse").authenticated();
                     auth.anyRequest().authenticated();
                 })
                 .oauth2ResourceServer(oauth2ResourceServer ->
