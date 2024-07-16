@@ -45,6 +45,7 @@ public class AuthenticatedBackendApplication {
                     passwordEncoder.encode("password"),
                     "admin@revalue.ie",
                     "Ireland",
+                    null,
                     LocalDateTime.now(),
                     LocalDateTime.now(),
                     null,

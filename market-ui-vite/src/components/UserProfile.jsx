@@ -9,12 +9,14 @@ const UserProfile = () => {
     username: '',
     email: '',
     location: '',
-    createdAt: null
+    createdAt: null,
+    profilePic: null // Initially null
   });
   const [isEditing, setIsEditing] = useState(false);
   const [editedDetails, setEditedDetails] = useState({
     email: '',
-    location: ''
+    location: '',
+    profilePic: null // Initially null for new upload
   });
   const navigate = useNavigate();
 
@@ -55,7 +57,8 @@ const UserProfile = () => {
     setIsEditing(true);
     setEditedDetails({
       email: userDetails.email || '',
-      location: userDetails.location || ''
+      location: userDetails.location || '',
+      profilePic: null // Ready for new upload
     });
   };
 
@@ -64,29 +67,33 @@ const UserProfile = () => {
     setEditedDetails(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleFileChange = (e) => {
+    setEditedDetails(prev => ({ ...prev, profilePic: e.target.files[0] }));
+  };
+
   const handleSave = async () => {
+    const formData = new FormData();
+    formData.append('email', editedDetails.email);
+    formData.append('location', editedDetails.location);
+    if (editedDetails.profilePic) {
+      formData.append('profilePic', editedDetails.profilePic);
+    }
+
     try {
       const response = await fetch(`http://localhost:8000/user/${authUser.username}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-          email: editedDetails.email,
-          location: editedDetails.location
-        })
+        body: formData
       });
 
       if (response.ok) {
-        setUserDetails(prev => ({
-          ...prev,
-          email: editedDetails.email,
-          location: editedDetails.location
-        }));
+        const updatedUser = await response.json();
+        setUserDetails(updatedUser);
         setIsEditing(false);
       } else {
-        console.error('Failed to update user details');
+        console.error('Failed to update user details', response.status);
       }
     } catch (error) {
       console.error('Error updating user details:', error);
@@ -123,6 +130,13 @@ const UserProfile = () => {
                 userDetails.location || 'Location not set'
               )}
             </p>
+            {userDetails.profilePic ? (
+              <img src={`data:image/jpeg;base64,${userDetails.profilePic}`} alt="Profile" className="w-32 h-32 rounded-full mt-4" />
+            ) : (
+              <div className="w-32 h-32 rounded-full mt-4 bg-gray-300 flex items-center justify-center text-gray-500">
+                No Profile Picture
+              </div>
+            )}
           </div>
           <div className="flex space-x-4 mt-4 md:mt-0">
             <button 
@@ -172,6 +186,11 @@ const UserProfile = () => {
               <Calendar size={18} className="mr-2" />
               Member since {formattedDate}
             </div>
+            {isEditing && (
+              <div className="flex items-center mt-4">
+                <input type="file" accept="image/*" onChange={handleFileChange} />
+              </div>
+            )}
           </div>
           
           <div>

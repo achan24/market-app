@@ -58,6 +58,7 @@ public class AuthenticationService {
                         encodedPassword,
                         null,
                         null,
+                        null,
                         LocalDateTime.now(),
                         LocalDateTime.now(),
                         null,

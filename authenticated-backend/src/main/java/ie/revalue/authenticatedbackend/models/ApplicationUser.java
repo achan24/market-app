@@ -35,6 +35,10 @@ public class ApplicationUser implements UserDetails {
     private String email;
     private String location;
 
+    @Lob
+    @Column(columnDefinition="LONGBLOB")
+    private byte[] profilePic;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -125,6 +129,7 @@ public class ApplicationUser implements UserDetails {
                 .append(", username='").append(username).append('\'')
                 .append(", email='").append(email).append('\'')
                 .append(", location='").append(location).append('\'')
+                .append(", profilePic=").append(profilePic != null ? "[BLOB]" : "null")
                 .append(", createdAt=").append(createdAt)
                 .append(", updatedAt=").append(updatedAt)
                 .append('}').toString();

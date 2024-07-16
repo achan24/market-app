@@ -1,8 +1,17 @@
 import React, { useState, useEffect, useContext } from 'react'
-import { Search, ShoppingBag, Heart, LogOut } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth, AuthContext } from './AuthContext'
 import CardListing from './CardListing'
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuIndicator,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  NavigationMenuViewport,
+} from '@/components/ui/navigation-menu'
 
 const Home = () => {
   const navigate = useNavigate()
@@ -12,70 +21,79 @@ const Home = () => {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
 
-  const data = []
   const fetchData = async () => {
     try {
       const response = await fetch('http://localhost:8000/api/v1/listings')
-      if(!response.ok) {
+      if (!response.ok) {
         throw new Error('Error fetching listings')
       }
       const data = await response.json()
-      console.log(data) 
-      return data   
-    } catch(err) {
-      console.log('Error fetching listings', err)
+      return data
+    } catch (err) {
+      console.error('Error fetching listings', err)
     }
   }
-  
+
   useEffect(() => {
     const getProducts = async () => {
       try {
         const data = await fetchData()
         setProducts(data)
       } catch (err) {
-        setError(err.message)
+        console.error(err.message)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     }
 
-    getProducts();
-  }, []);
-  
-  console.log(`Authentication status: ${isAuthenticated}`)
-  if (user) {
-    console.log(`User details: ${JSON.stringify(user)}`)
-  } else {
-    console.log('No user logged in')
-  }
+    getProducts()
+  }, [])
 
   const slides = [
-    { 
-      image: "https://i.postimg.cc/NMgTbKhr/Furniture3.jpg", 
-      text: "Breathing new life into pre-loved items" 
-    },
-    { 
-      image: "https://i.postimg.cc/ydV2QP92/Jars-Clocks.jpg", 
-      text: "Yesterday's gems are tomorrow's treasures" 
-    },
-    { 
-      image: "https://i.postimg.cc/4dBqr9Qy/Reimagine.jpg", 
-      text: "Reimagine, Reuse, Revalue" 
-    },
-  ];
+    { image: "https://i.postimg.cc/NMgTbKhr/Furniture3.jpg", text: "Breathing new life into pre-loved items" },
+    { image: "https://i.postimg.cc/ydV2QP92/Jars-Clocks.jpg", text: "Yesterday's gems are tomorrow's treasures" },
+    { image: "https://i.postimg.cc/4dBqr9Qy/Reimagine.jpg", text: "Reimagine, Reuse, Revalue" },
+  ]
+
+  const categories = {
+    Motors: ['Cars', 'Motorcycles', 'Trucks', 'Boats'],
+    'Electronics & Media': ['Computers', 'Phones', 'TVs', 'Cameras', 'Other Electronics'],
+    'Hobbies & Lifestyle': ['No items available'],
+    'Fashion & Beauty': ['Women\'s Clothing', 'Men\'s Clothing', 'Jewelry', 'Cosmetics'],
+    'Home & Living': ['Furniture', 'Home Decor', 'Garden', 'Appliances']
+  }
 
   return (
     <div className="font-sans">
-    
-
       {/* Navigation */}
-        <nav className="bg-gray-100 p-2 flex justify-center space-x-4">
-          <button className="text-gray-700 hover:bg-gray-200 rounded-full px-4 py-2">Motors</button>
-          <button className="text-gray-700 hover:bg-gray-200 rounded-full px-4 py-2">Electronics & Media</button>
-          <button className="text-gray-700 hover:bg-gray-200 rounded-full px-4 py-2">Hobbies & Lifestyle</button>
-          <button className="text-gray-700 hover:bg-gray-200 rounded-full px-4 py-2">Fashion & Beauty</button>
-          <button className="text-gray-700 hover:bg-gray-200 rounded-full px-4 py-2">Home & Living</button>
-        </nav>
+      <nav className="bg-gray-100 p-2 flex justify-center space-x-4">
+        <NavigationMenu>
+          <NavigationMenuList>
+            {Object.keys(categories).map((category, index) => (
+              <NavigationMenuItem key={index}>
+                <NavigationMenuTrigger>{category}</NavigationMenuTrigger>
+                {categories[category].length > 0 && (
+                  <NavigationMenuContent className="p-2 bg-white border rounded-md shadow-lg">
+                    <div className="space-y-1">
+                      {categories[category].map((item, index) => (
+                        <NavigationMenuLink
+                          key={index}
+                          href="#"
+                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                        >
+                          {item}
+                        </NavigationMenuLink>
+                      ))}
+                    </div>
+                  </NavigationMenuContent>
+                )}
+              </NavigationMenuItem>
+            ))}
+          </NavigationMenuList>
+          <NavigationMenuIndicator />
+          <NavigationMenuViewport />
+        </NavigationMenu>
+      </nav>
 
       {/* Hero Carousel */}
       <div className="carousel w-full h-80 mb-8 relative">
@@ -97,22 +115,21 @@ const Home = () => {
 
       {/* Main Content */}
       <main className="container mx-auto mt-8">
-        {loading ?
-          <div>Loading...</div> : (
+        {loading ? (
+          <div>Loading...</div>
+        ) : (
           <div>
             <h2 className="text-2xl font-bold mb-4">Live Data Card List</h2>
             <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {products.map((product, index) => (
-                <CardListing key={index} product={product} className="transform transition-transform duration-200 hover:scale-105
-                hover:shadow-lg hover:border-gray-400"/>
+                <CardListing key={index} product={product} className="transform transition-transform duration-200 hover:scale-105 hover:shadow-lg hover:border-gray-400" />
               ))}
             </div>
           </div>
-          )
-        }
+        )}
       </main>
     </div>
-  );
-};
+  )
+}
 
-export default Home;
+export default Home

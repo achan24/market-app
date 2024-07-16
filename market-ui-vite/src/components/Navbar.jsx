@@ -1,13 +1,41 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Search, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, AuthContext } from './AuthContext';
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, token } = useAuth();
   const { logout } = useContext(AuthContext);
   const [searchQuery, setSearchQuery] = useState('');
+  const [userDetails, setUserDetails] = useState(null);
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      if (!user || !user.username) return;
+
+      try {
+        const response = await fetch(`http://localhost:8000/user/${user.username}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setUserDetails(data);
+        } else {
+          console.error('Failed to fetch user details, status:', response.status);
+        }
+      } catch (error) {
+        console.error('Error fetching user details:', error);
+      }
+    };
+
+    if (isAuthenticated) {
+      fetchUserDetails();
+    }
+  }, [isAuthenticated, user]);
 
   const login = () => {
     navigate('/login');
@@ -60,10 +88,21 @@ const Navbar = () => {
           </form>
         </div>
         <div className="flex items-center space-x-6">
-          {isAuthenticated && (
+          {isAuthenticated ? (
             <div className="flex items-center space-x-3">
-              <button onClick={handleUsernameClick}>
-                <h2 className="border border-gray-400 rounded-full px-4 py-2">{user.username}</h2>
+              <button onClick={handleUsernameClick} className="flex items-center space-x-2 border border-gray-400 rounded-full px-2 py-1">
+                {userDetails && userDetails.profilePic ? (
+                  <img
+                    src={`data:image/jpeg;base64,${userDetails.profilePic}`}
+                    alt="Profile"
+                    className="w-8 h-8 rounded-full"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-500">
+                    No Image
+                  </div>
+                )}
+                <h2>{user.username}</h2>
               </button>
               <div className="relative group">
                 <LogOut className="cursor-pointer" onClick={logOut} />
@@ -72,8 +111,7 @@ const Navbar = () => {
                 </span>
               </div>
             </div>
-          )}
-          {!isAuthenticated && (
+          ) : (
             <button onClick={login} className="text-gray-700 border-2 border-black px-4 py-2 rounded-full hover:bg-gray-100">
               Login or Signup
             </button>

@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 import java.util.List;
@@ -64,7 +65,8 @@ public class UserController {
                     user.getCreatedAt(),
                     user.getSellerListingIds(),
                     user.getBuyerListingIds(),
-                    userConversations
+                    userConversations,
+                    user.getProfilePic()
             );
             System.out.println("user details: " + userDetails);
 
@@ -83,7 +85,11 @@ public class UserController {
 
 
     @PutMapping("/{username}")
-    public ResponseEntity<?> updateUserDetails(@PathVariable String username, @RequestBody Map<String, String> updates, @AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<?> updateUserDetails(
+            @PathVariable String username,
+            @RequestParam Map<String, String> updates,
+            @RequestParam(value = "profilePic", required = false) MultipartFile profilePic,
+            @AuthenticationPrincipal Jwt jwt) {
         String tokenUsername = jwt.getClaimAsString("sub");
         System.out.println("JWT token username: " + tokenUsername);
         System.out.println("Requested username: " + username);
@@ -108,10 +114,27 @@ public class UserController {
                 user.setLocation(newLocation);
             }
 
+            if (profilePic != null && !profilePic.isEmpty()) {
+                user.setProfilePic(profilePic.getBytes());
+            }
+
             userRepository.save(user);
             System.out.println("User after update: " + user);
 
-            return ResponseEntity.ok("User details updated successfully");
+            List<Conversation> userConversations = userService.getAllConversationsForUser(user.getUserId());
+
+            UserDetailsDTO userDetails = new UserDetailsDTO(
+                    user.getUsername(),
+                    user.getEmail(),
+                    user.getLocation(),
+                    user.getCreatedAt(),
+                    user.getSellerListingIds(),
+                    user.getBuyerListingIds(),
+                    userConversations,
+                    user.getProfilePic()
+            );
+
+            return ResponseEntity.ok(userDetails);
         } catch (UsernameNotFoundException e) {
             System.out.println("User not found: " + username);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found: " + username);
@@ -120,6 +143,8 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error updating user details: " + e.getMessage());
         }
     }
+
+
 
     @GetMapping("/email/{username}")
     public ResponseEntity<?> getUserEmail(@PathVariable String username, @AuthenticationPrincipal Jwt jwt) {
