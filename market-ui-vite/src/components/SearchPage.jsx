@@ -5,12 +5,35 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Icon } from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import 'leaflet/dist/leaflet.css';
+import categories from './Categories';
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
 };
 
 const fetchGeocode = async (locationName) => {
+  const response = await fetch(`http://localhost:8000/api/v1/location?locationName=${encodeURIComponent(locationName)}`);
+  if (!response.ok) {
+    throw new Error('Error fetching geocode');
+  }
+  return response.json();
+};
+
+const saveGeocode = async (location) => {
+  const response = await fetch(`http://localhost:8000/api/v1/location`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(location),
+  });
+  if (!response.ok) {
+    throw new Error('Error saving geocode');
+  }
+  return response.json();
+};
+
+const fetchGeocodeFromAPI = async (locationName) => {
   const apiKey = import.meta.env.VITE_LOCATIONIQ_API_KEY; // Use Vite's import.meta.env
   if (!apiKey) {
     console.error('LocationIQ API key is not set in the environment variables');
@@ -40,13 +63,15 @@ const SearchPage = () => {
   const [showMap, setShowMap] = useState(false);
   const [activeMarker, setActiveMarker] = useState(null);
   const query = useQuery().get('query') || '';
+  const categoryParam = useQuery().get('category') || '';
 
-  const categories = [
-    { label: "Motors", options: ["Cars", "Motorcycles", "Trucks", "Boats"] },
-    { label: "Electronics & Media", options: ["Computers", "Phones", "TVs", "Cameras", "Other Electronics"] },
-    { label: "Home & Living", options: ["Furniture", "Home Decor", "Garden", "Appliances"] },
-    { label: "Fashion & Beauty", options: ["Women's Clothing", "Men's Clothing", "Jewelry", "Cosmetics"] },
-  ];
+  useEffect(() => {
+    const delay = setTimeout(() => {
+      setFilters((prevFilters) => ({ ...prevFilters, category: categoryParam }));
+    }, 500); // 0.5 second delay
+
+    return () => clearTimeout(delay);
+  }, [categoryParam]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -55,10 +80,10 @@ const SearchPage = () => {
 
   const fetchData = async () => {
     try {
-      let queryStr = `query=${query}&`;
-      if (filters.category) queryStr += `category=${filters.category}&`;
-      if (filters.location) queryStr += `location=${filters.location}&`;
-      if (filters.price) queryStr += `price=${filters.price}&`;
+      let queryStr = `query=${query}`;
+      if (filters.category) queryStr += `&category=${filters.category}`;
+      if (filters.location) queryStr += `&location=${filters.location}`;
+      if (filters.price) queryStr += `&price=${filters.price}`;
 
       const response = await fetch(`http://localhost:8000/api/v1/listings?${queryStr}`);
       if (!response.ok) {
@@ -66,9 +91,18 @@ const SearchPage = () => {
       }
       const data = await response.json();
 
-      // Fetch geocode data for each listing
-      const listingsWithGeocode = await Promise.all(data.map(async (listing) => {
-        const geocode = await fetchGeocode(listing.location);
+      // Fetch geocode data for each listing with delay
+      const listingsWithGeocode = await Promise.all(data.map(async (listing, index) => {
+        let geocode;
+        try {
+          geocode = await fetchGeocode(listing.location);
+        } catch (error) {
+          console.log('Geocode not found, fetching from API');
+          geocode = await fetchGeocodeFromAPI(listing.location);
+          if (geocode) {
+            await saveGeocode({ name: listing.location, latitude: geocode.lat, longitude: geocode.lon });
+          }
+        }
         return { ...listing, geocode };
       }));
 
@@ -78,7 +112,7 @@ const SearchPage = () => {
       const markersData = listingsWithGeocode
         .filter(listing => listing.geocode)
         .map(listing => ({
-          geocode: [listing.geocode.lat, listing.geocode.lon],
+          geocode: [listing.geocode.latitude, listing.geocode.longitude],
           listing // Include the entire listing data for the popup
         }));
 
@@ -117,7 +151,7 @@ const SearchPage = () => {
   const handleMarkerMouseOut = () => {
     setTimeout(() => {
       setActiveMarker(null);
-    }, 300); // Delay before hiding the popup
+    }, 1000); // Delay before hiding the popup
   };
 
   const CustomMarker = ({ position, listing }) => {
@@ -149,9 +183,9 @@ const SearchPage = () => {
           <label className="block text-sm font-medium mb-1">Category</label>
           <select name="category" value={filters.category} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded">
             <option value="">Select a category</option>
-            {categories.map((group, index) => (
-              <optgroup key={index} label={group.label}>
-                {group.options.map((option, idx) => (
+            {Object.keys(categories).map((group, index) => (
+              <optgroup key={index} label={group}>
+                {categories[group].map((option, idx) => (
                   <option key={idx} value={option}>{option}</option>
                 ))}
               </optgroup>
@@ -184,7 +218,7 @@ const SearchPage = () => {
         {loading ? (
           <div>Loading...</div>
         ) : showMap ? (
-          <MapContainer className="h-screen" center={[53.3498, -6.2603]} zoom={13}>
+          <MapContainer className="h-screen" center={[53.3498, -6.2603]} zoom={10}>
             <TileLayer
               attribution='openstreetmap contributors'
               url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"

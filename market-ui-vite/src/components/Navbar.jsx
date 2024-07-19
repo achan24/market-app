@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { Search, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, AuthContext } from './AuthContext';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -98,9 +99,9 @@ const Navbar = () => {
                     className="w-8 h-8 rounded-full"
                   />
                 ) : (
-                  <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-500">
-                    No Image
-                  </div>
+                  <Avatar>
+                    <AvatarFallback>{user.username.charAt(0)}</AvatarFallback>
+                  </Avatar>
                 )}
                 <h2>{user.username}</h2>
               </button>

@@ -8,6 +8,7 @@ import ie.revalue.authenticatedbackend.repository.UserRepository;
 import ie.revalue.authenticatedbackend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -170,6 +171,28 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error fetching user email: " + e.getMessage());
         }
     }
+
+
+    @GetMapping("/profile-pic/{username}")
+    public ResponseEntity<byte[]> getUserProfilePic(@PathVariable String username) {
+        try {
+            ApplicationUser user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+            byte[] profilePic = user.getProfilePic();
+            if (profilePic == null) {
+                // Return null with an OK status if the profile picture is not found
+                return ResponseEntity.ok(null);
+            }
+            return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(profilePic);
+        } catch (UsernameNotFoundException e) {
+            // Return 404 Not Found status if the user is not found
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
 
 
 }

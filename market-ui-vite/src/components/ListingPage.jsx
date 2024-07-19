@@ -20,6 +20,8 @@ const ListingPage = () => {
   const [acceptedOffer, setAcceptedOffer] = useState(null);
   const [paypalClientId, setPaypalClientId] = useState(null);
   const [sellerEmail, setSellerEmail] = useState(null);
+  const [sellerProfilePic, setSellerProfilePic] = useState(null);
+  const [commenterProfilePics, setCommenterProfilePics] = useState({});
 
   const navigate = useNavigate();
 
@@ -33,8 +35,9 @@ const ListingPage = () => {
         const data = await response.json();
         setListing(data);
 
-        // Fetch seller email after listing is fetched
+        // Fetch seller email and profile picture after listing is fetched
         fetchSellerEmail(data.sellerName);
+        fetchUserProfilePic(data.sellerName, setSellerProfilePic);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -50,6 +53,15 @@ const ListingPage = () => {
         }
         const data = await response.json();
         setComments(data);
+
+        // Fetch profile pictures for each commenter
+        const profilePicPromises = data.map(comment => fetchUserProfilePic(comment.username));
+        const profilePics = await Promise.all(profilePicPromises);
+        const profilePicMap = {};
+        data.forEach((comment, index) => {
+          profilePicMap[comment.username] = profilePics[index];
+        });
+        setCommenterProfilePics(profilePicMap);
       } catch (err) {
         console.error('Error fetching comments:', err);
       }
@@ -86,6 +98,21 @@ const ListingPage = () => {
         }
       } catch (err) {
         console.error('Error fetching seller email:', err);
+      }
+    };
+
+    const fetchUserProfilePic = async (username, setProfilePic) => {
+      try {
+        const response = await fetch(`http://localhost:8000/user/profile-pic/${username}`);
+        if (response.ok) {
+          const blob = await response.blob();
+          const url = URL.createObjectURL(blob);
+          setProfilePic(url);
+        } else {
+          console.error('Failed to fetch user profile picture, status:', response.status);
+        }
+      } catch (error) {
+        console.error('Error fetching user profile picture:', error);
       }
     };
 
@@ -196,7 +223,7 @@ const ListingPage = () => {
             <p className="text-xl font-semibold mb-2">€{listing.askingPrice}</p>
             <div className="flex items-center mb-4">
               <Avatar className="h-10 w-10">
-                <AvatarImage src={listing.sellerAvatar} alt={listing.sellerName} />
+                <AvatarImage src={sellerProfilePic || 'https://github.com/shadcn.png'} alt={listing.sellerName} />
                 <AvatarFallback>{listing.sellerName.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
               <div className="ml-3">
@@ -248,6 +275,7 @@ const ListingPage = () => {
               <div className="flex items-start mb-2">
                 <div className="mr-4">
                   <Avatar>
+                    <AvatarImage src={commenterProfilePics[comment.username] || 'https://github.com/shadcn.png'} />
                     <AvatarFallback>{comment.username[0].toUpperCase()}</AvatarFallback>
                   </Avatar>
                 </div>
@@ -315,8 +343,6 @@ const ListingPage = () => {
                       )}
                     </>
                   )}
-
-
                 </div>
               </div>
             </div>
@@ -339,5 +365,3 @@ const ListingPage = () => {
 };
 
 export default ListingPage;
-
-

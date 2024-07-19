@@ -66,10 +66,12 @@ public class SecurityConfiguration {
                     auth.requestMatchers("/auth/**").permitAll(); //allow all to this endpoint
                     auth.requestMatchers(HttpMethod.GET, "/api/v1/listings/**").permitAll(); // Allow GET requests to this endpoint without authentication
                     //auth.requestMatchers("/api/paypal-client-id").authenticated(); // Require authentication for PayPal client ID endpoint
+                    auth.requestMatchers(HttpMethod.GET, "/user/profile-pic/**").permitAll(); // Allow access to profile pictures
                     auth.requestMatchers("/admin/**").hasRole("ADMIN");
                     auth.requestMatchers("/user/**").hasAnyRole("ADMIN", "USER");
                     auth.requestMatchers("/api/v1/conversations/**").authenticated();
                     auth.requestMatchers("/vision/analyse").authenticated();
+                    auth.requestMatchers("/api/v1/location/**").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .oauth2ResourceServer(oauth2ResourceServer ->

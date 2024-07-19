@@ -3,6 +3,7 @@ import PhotoUpload from './PhotoUpload';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectLabel, SelectItem} from './ui/select'
 import { useAuth } from './AuthContext';
 import { useNavigate } from 'react-router-dom';
+import categories from './Categories';
 
 const CreateListing = () => {
   const { token } = useAuth()
@@ -29,24 +30,12 @@ const CreateListing = () => {
     setSelectedFiles(newFiles);
   };
 
-  const categoryData = [
-    {
-      name: "Motors",
-      subcategories: ["Cars", "Motorcycles", "Trucks", "Boats"]
-    },
-    {
-      name: "Electronics & Media",
-      subcategories: ["Computers", "Phones", "TVs", "Cameras", "Other Electronics"]
-    },
-    {
-      name: "Home & Living",
-      subcategories: ["Furniture", "Home Decor", "Garden", "Appliances"]
-    },
-    {
-      name: "Fashion & Beauty",
-      subcategories: ["Women's Clothing", "Men's Clothing", "Jewelry", "Cosmetics"]
-    }
-  ]
+  
+  const categoryData = Object.keys(categories).map(key => ({
+    name: key,
+    subcategories: categories[key]
+  }));
+
 
   const handleCategoryChange = (event) => {
     setSelectedCategory(event)
@@ -217,7 +206,7 @@ const CreateListing = () => {
           disabled={isAnalyzing || selectedFiles.length === 0}
           className="mt-2 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
         >
-          {isAnalyzing ? 'Analyzing...' : 'Categorize with Google Vision'}
+          {isAnalyzing ? 'Analyzing...' : 'Categorise with Google Vision'}
         </button>
         
         <div>
