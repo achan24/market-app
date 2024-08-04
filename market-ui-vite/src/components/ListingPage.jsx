@@ -240,8 +240,6 @@ const ListingPage = () => {
             <div className="mb-6">
               <h2 className="text-xl font-semibold mb-2">Shipping Options</h2>
               <ul className="list-disc pl-5">
-                <li>Standard Shipping: €5.99</li>
-                <li>Express Shipping: €12.99</li>
                 <li>Local Pickup: Free</li>
               </ul>
             </div>
