@@ -186,7 +186,7 @@ const Inbox = () => {
                 <div className="flex-grow">
                   <h3 className="font-semibold">{listingDetails[conversation.listingId]?.title || 'Loading...'}</h3>
                   <p className="text-sm text-gray-600">
-                    Price: ${listingDetails[conversation.listingId]?.acceptedPrice || listingDetails[conversation.listingId]?.askingPrice || 'N/A'}
+                    Price: €{listingDetails[conversation.listingId]?.acceptedPrice || listingDetails[conversation.listingId]?.askingPrice || 'N/A'}
                   </p>
                 </div>
               </div>

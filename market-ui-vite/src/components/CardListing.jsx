@@ -92,7 +92,6 @@ const CardListing = (props) => {
           </div>
         </CardContent>
         <CardFooter className="flex justify-between">
-          <Button variant="outline">Contact Seller</Button>
           <div className="flex items-center space-x-2">
             <div className="flex items-center text-xs text-muted-foreground">
               <Clock className="mr-1" size={14} />

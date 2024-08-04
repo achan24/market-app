@@ -5,6 +5,8 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Icon } from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import categories from './Categories';
 
 const useQuery = () => {
@@ -140,10 +142,6 @@ const SearchPage = () => {
     iconSize: [38, 38]
   });
 
-  const createCustomClusterIcon = (cluster) => {
-    // Custom cluster icon function (can be customized)
-  };
-
   const handleMarkerMouseOver = (markerId) => {
     setActiveMarker(markerId);
   };
@@ -218,12 +216,12 @@ const SearchPage = () => {
         {loading ? (
           <div>Loading...</div>
         ) : showMap ? (
-          <MapContainer className="h-screen" center={[53.3498, -6.2603]} zoom={10}>
+          <MapContainer className="h-screen" center={[53.3498, -6.2603]} zoom={12}>
             <TileLayer
               attribution='openstreetmap contributors'
               url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-            <MarkerClusterGroup chunkedLoading iconCreateFunction={createCustomClusterIcon}>
+            <MarkerClusterGroup chunkedLoading>
               {markers.map((marker, key) => (
                 <CustomMarker key={key} position={marker.geocode} listing={marker.listing} />
               ))}
@@ -232,7 +230,7 @@ const SearchPage = () => {
         ) : (
           <div>
             <h2 className="text-2xl font-bold mb-4">Search Results</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {products.map((product, index) => (
                 <CardListing key={index} product={product} className="transform transition-transform duration-200 hover:scale-105 hover:shadow-lg hover:border-gray-400"/>
               ))}

@@ -30,15 +30,6 @@ public class ListingController {
 
 
 
-
-
-    // Create a new listing
-//    @PostMapping
-//    public ResponseEntity<Listing> createListing(@RequestBody Listing listing) {
-//        Listing createdListing = listingService.createListing(listing);
-//        return new ResponseEntity<>(createdListing, HttpStatus.CREATED);
-//    }
-
     @PostMapping(consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ListingDTO> createListing(
             @RequestPart("listing") ListingDTO listingDTO,
